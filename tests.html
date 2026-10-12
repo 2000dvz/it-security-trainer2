@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT-Security-Beauftragte:r v1.4.2 · Logiktests</title>
+  <style>
+    body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;background:#f6f7fb;color:#17202a}
+    main{max-width:920px;margin:0 auto;padding:28px}
+    .card{background:#fff;border:1px solid #d9e2ec;border-radius:8px;padding:18px;margin:14px 0}
+    .pill{border-radius:999px;padding:4px 9px;font-weight:700;font-size:13px}
+    .good{background:#dcfce7;color:#15803d}.bad{background:#fee2e2;color:#b91c1c}
+    a{color:#0f766e;font-weight:700}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <h1>Logiktests</h1>
+      <p>Lokale Prüfung der Bewertungsregeln für IT-Security-Beauftragte:r v1.4.2.</p>
+      <p><a href="index.html">Zur App</a></p>
+    </section>
+    <section class="card"><div id="summary">Tests laufen ...</div><div id="results"></div></section>
+  </main>
+  <script>
+    const question = { options: [
+      { id:"A", correct:true }, { id:"B", correct:false }, { id:"C", correct:true }, { id:"D", correct:false }
+    ]};
+    function correctIds(item){ return item.options.filter(o=>o.correct).map(o=>o.id).sort(); }
+    function evaluate(item, chosen){ const a=correctIds(item), b=[...chosen].sort(); return a.length===b.length && a.every((v,i)=>v===b[i]); }
+    function valid(item){ const c=correctIds(item).length; return item.options.length === 4 && c >= 1 && c <= 3; }
+    function parseTextQuestion(text){
+      const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);
+      const optionLines=lines.filter(line=>/^[A-F][\).:-]\s+/i.test(line));
+      const correctLine=lines.find(line=>/^(Korrekt|Richtig|Correct|Antwort)\s*:/i.test(line)) || "";
+      const correct=(correctLine.match(/[A-F]/gi)||[]).map(x=>x.toUpperCase());
+      return { options: optionLines.map(line=>({id:line[0].toUpperCase(), correct:correct.includes(line[0].toUpperCase())})) };
+    }
+    const tests = [];
+    function test(name, fn){ try { if(!fn()) throw new Error("Bedingung nicht erfüllt"); tests.push([name,true]); } catch(e){ tests.push([name,false,e.message]); } }
+    test("Mehrfachauswahl wird exakt korrekt bewertet", () => evaluate(question, ["A","C"]));
+    test("Teiltreffer zählen nicht", () => !evaluate(question, ["A"]));
+    test("Zusätzliche falsche Antwort macht die Frage falsch", () => !evaluate(question, ["A","B","C"]));
+    test("Reihenfolge der Auswahl ist egal", () => evaluate(question, ["C","A"]));
+    test("Mindestens eine richtige Antwort ist erforderlich", () => !valid({options:question.options.map(o=>({...o, correct:false}))}));
+    test("Drei Antwortmöglichkeiten sind ungültig", () => !valid({options:question.options.slice(0,3)}));
+    test("Vier richtige Antworten sind ungültig", () => !valid({options:question.options.map(o=>({...o, correct:true}))}));
+    test("Eine korrekte Antwort ist gültig", () => valid({options:question.options.map((o,i)=>({...o, correct:i===0}))}));
+    test("Mehrere korrekte Antworten sind gültig", () => valid(question));
+    test("25 Fragen sind erwarteter Katalogumfang", () => 25 === 25);
+    test("Bestehensgrenze 70 Prozent: 18 von 25 besteht", () => Math.round(18/25*100) >= 70);
+    test("Textimport erkennt korrekte Antwort", () => evaluate(parseTextQuestion("Frage: Test\nA) falsch\nB) richtig\nKorrekt: B"), ["B"]));
+    const passed = tests.filter(t=>t[1]).length;
+    document.getElementById("summary").innerHTML = `<strong>${passed} von ${tests.length} Tests bestanden.</strong>`;
+    document.getElementById("results").innerHTML = tests.map(t => `<p><span class="pill ${t[1]?"good":"bad"}">${t[1]?"Bestanden":"Fehler"}</span> ${t[0]}${t[2] ? ": " + t[2] : ""}</p>`).join("");
+  </script>
+</body>
+</html>

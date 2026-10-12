@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lokale Browser-App IT-Security-Beauftragte:r v1.4.2.">
+  <title>IT-Security-Beauftragte:r v1.4.2</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --panel-2: #eef3f8;
+      --text: #17202a;
+      --muted: #64748b;
+      --line: #d9e2ec;
+      --brand: #0f766e;
+      --brand-2: #115e59;
+      --accent: #2563eb;
+      --good: #15803d;
+      --bad: #b91c1c;
+      --warn: #b45309;
+      --shadow: 0 18px 50px rgba(15, 23, 42, .08);
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg: #111827;
+      --panel: #182231;
+      --panel-2: #223044;
+      --text: #eef2f7;
+      --muted: #aab6c7;
+      --line: #314157;
+      --brand: #2dd4bf;
+      --brand-2: #5eead4;
+      --accent: #60a5fa;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .skip-link { position: absolute; left: -999px; top: 8px; background: var(--panel); padding: 10px; z-index: 10; }
+    .skip-link:focus { left: 8px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 280px 1fr; }
+    .sidebar { background: #0f172a; color: #e5eef8; padding: 22px; display: flex; flex-direction: column; gap: 22px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 44px; height: 44px; border-radius: 8px; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 800; }
+    .brand small { color: #9fb0c7; display: block; margin-top: 2px; }
+    nav { display: grid; gap: 8px; }
+    .nav-item { border: 0; background: transparent; color: inherit; text-align: left; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,.12); }
+    .local-note { margin-top: auto; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 12px; color: #bdc9da; font-size: 14px; }
+    .workspace { min-width: 0; }
+    .topbar { padding: 20px 28px; background: var(--panel); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; align-items: center; position: sticky; top: 0; z-index: 5; }
+    .eyebrow { margin: 0 0 3px; color: var(--brand); font-weight: 700; font-size: 13px; text-transform: uppercase; }
+    h1, h2, h3 { margin: 0; letter-spacing: 0; }
+    h1 { font-size: clamp(25px, 3vw, 36px); }
+    h2 { font-size: 22px; }
+    h3 { font-size: 17px; }
+    main { padding: 28px; max-width: 1240px; margin: 0 auto; width: 100%; }
+    .grid { display: grid; gap: 16px; }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+    .pad { padding: 18px; }
+    .section { margin-top: 18px; }
+    .muted { color: var(--muted); }
+    .metric { display: grid; gap: 4px; }
+    .metric strong { font-size: 30px; }
+    .button, .icon-button { border: 1px solid transparent; border-radius: 8px; background: var(--brand); color: #fff; padding: 10px 14px; font-weight: 700; }
+    .button.secondary, .icon-button.secondary { background: var(--panel-2); color: var(--text); border-color: var(--line); }
+    .button.next { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .button.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+    .button.danger { background: var(--bad); color: #fff; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .icon-button { width: 42px; height: 42px; padding: 0; display: grid; place-items: center; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 14px; }
+    input, select, textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 8px; padding: 10px 12px; }
+    textarea { min-height: 78px; resize: vertical; }
+    input[type="checkbox"] { width: auto; }
+    .setting-grid { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 12px; }
+    .checkline { display: flex; align-items: center; gap: 8px; color: var(--text); }
+    .question-card { display: grid; gap: 16px; }
+    .question-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill { border-radius: 999px; padding: 5px 9px; background: var(--panel-2); color: var(--muted); font-size: 13px; font-weight: 700; }
+    .pill.good { background: rgba(21,128,61,.13); color: var(--good); }
+    .pill.bad { background: rgba(185,28,28,.13); color: var(--bad); }
+    .pill.warn { background: rgba(180,83,9,.15); color: var(--warn); }
+    .option { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; gap: 10px; align-items: flex-start; background: var(--panel); }
+    .option.correct { border-color: rgba(21,128,61,.5); background: rgba(21,128,61,.08); }
+    .option.wrong { border-color: rgba(185,28,28,.5); background: rgba(185,28,28,.08); }
+    .feedback { border-left: 4px solid var(--brand); background: var(--panel-2); padding: 14px; border-radius: 8px; }
+    .feedback.error { border-color: var(--bad); }
+    .timer { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--brand-2); }
+    .progress { height: 10px; background: var(--panel-2); border-radius: 99px; overflow: hidden; }
+    .progress span { display: block; height: 100%; background: var(--brand); width: 0; }
+    .bar { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .bar span { display: block; height: 100%; background: var(--accent); }
+    .list { display: grid; gap: 10px; }
+    .list-item { border: 1px solid var(--line); border-radius: 8px; padding: 13px; background: var(--panel); }
+    .answer-grid { display: grid; gap: 8px; margin-top: 10px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 13px; }
+    .menu-button { display: none; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; z-index: 20; transform: translateX(-100%); transition: transform .2s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .menu-button { display: grid; }
+      .topbar, main { padding-left: 16px; padding-right: 16px; }
+      .cols-2, .cols-3, .setting-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#app">Zum Inhalt springen</a>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark">IT</span>
+        <span><strong>IT-Security-Beauftragte:r</strong><small>Version 1.4.2 · lokal</small></span>
+      </div>
+      <nav aria-label="Hauptnavigation">
+        <button class="nav-item active" data-view="dashboard">⌂ Dashboard</button>
+        <button class="nav-item" data-view="practice">✓ Üben</button>
+        <button class="nav-item" data-view="exam">◷ Prüfung</button>
+        <button class="nav-item" data-view="questions">≣ Fragenbank</button>
+        <button class="nav-item" data-view="analysis">↗ Lernanalyse</button>
+        <button class="nav-item" data-view="settings">⚙ Einstellungen</button>
+      </nav>
+      <div class="local-note"><strong>Privat gespeichert</strong><br>Ergebnisse bleiben im Browser auf diesem Gerät.</div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <button class="icon-button secondary menu-button" id="menu">☰</button>
+        <div>
+          <p class="eyebrow">IT-Security-Beauftragte:r · v1.4.2</p>
+          <h1 id="title">Dashboard</h1>
+        </div>
+        <div class="button-row">
+          <span class="pill" id="storage">Lokal</span>
+          <button class="icon-button secondary" id="theme" title="Farbschema wechseln">◐</button>
+        </div>
+      </header>
+      <main id="app" tabindex="-1"></main>
+    </div>
+  </div>
+  <script>
+        const DEFAULT_QUESTIONS = [
+      q(1,"Was muss bei der Konzeption bei der Sicherheit bei der Definition des Scopes beachtet werden?",["Eine klare Abgrenzung ist erforderlich", "Schnittstellen von externen Partner müssen berücksichtigt werden", "Der Scope ist ein unwesentlicher Bestandteil", "Welche Teile, Aufgaben bzw. kritische Geschäftsprozesse muss der Geltungsbereich beinhalten"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(2,"Wie können von Unternehmen zu Unternehmen dokumentierte Informationen unterschieden werden?",["Es besteht eine Wechselwirkung und Komplexität bei den Prozessen", "In der Unternehmensgröße, angebotene Dienstleistungen, abgebildete Prozesse und Produkten", "Durch Vorgaben der Kammern", "Fachliche Qualifikation der Person"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(3,"Welche Grundaufgaben sind in der IT-Sicherheit etabliert?",["Rechte nur im Bedarfsfall vergeben", "Komplexe Prozesse", "Leistungsstarke Server absichern", "Kosten / Nutzen"],["A", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(4,"Bei welchen Kontrollen müssen im Vorfeld evtl. die Persönlichkeitsrechte überprüft werden?",["Videoüberwachung", "Brandschutztüren", "Abgleichen von Biometrischen Punkten", "Durchführen von Personenkontrollen"],["A", "C", "D"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(5,"Welche Beispiele stellen organisatorische Schutzmaßnahmen dar?",["Aufbau eines Informationssicherheitsmanagementsystem", "Das IT-Risikomanagement", "Durchführen von Pentests", "Ein ausgearbeitetes Notfallmanagement"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(6,"Welche Vorgabe für Audits wird zwischen 2 Zertifizierungsjahren (ISO 27001) muss ein Unternehmen eigenständig jährlich durchführen?",["4 pro Jahr", "Mindestens 1 Audit pro Jahr", "überhaupt keins", "pro Halbjahr 1"],["B"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(7,"Welche Prozesse werden in der IT-Security abgebildet?",["Ein Risikomanagement zu implementieren", "Ein Identitätsmanagement", "einen betrieblichen Eskalationspfad zu erstellen", "Eine Zugangs- und Zugriffskontrolle einrichten"],["B", "D"],"Überarbeitete Fragen","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(8,"Bei einem Logistik Unternehmen „Weltweite Lieferungen“ sind Sie als ISB beschäftigt. Das Management möchte, dass Sie ein ISMS implementieren, da durch die weltweiten Abhängigkeiten immer mehr Sicherheitsrisiken entstehen. Sie zeigen dem Management Ihre Einschätzungen mit dem Bezug zum BSI. Welche allgemeinen Einflussfaktoren sollen laut dem BSI vorhanden sein?",["Die Verantwortungsstrukturen und die Unternehmensstruktur", "Die Unternehmensziele mit der strategischen Ausrichtung des Unternehmens", "Das technische Know How von Mitarbeiter/innen", "Regelung der Zusammenarbeit mit externen Partnern"],["A", "B", "D"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(9,"Bei einem IT-Dienstleister übernehmen Sie die Verantwortung des Informationssicherheitsbeautragten, Diesen Unternehmen nimmt Cloud Serverfarmen in Betrieb. Bei der Planung müssen Sie auch die physische Sicherheit berücksichtigen zusätzlich tragen Sie die Verantwortung den Brandschutz. Welche Punkte sollten bei der Einführung eines Normkonformen ISMS (ISO 27001) berücksichtigt werden, damit die Informationen und die physische Sicherheit gewährleistet wird?",["Es sollte ein Brandschutzbeauftragte/r benannt werden", "Identifizierung und Dokumentation aller (branchenspezifischer, nationaler und lokaler) Brandschutzvorschriften und -normen", "Brandschutzmaßnahmen müssen von der IT Leitung beauftragt werden", "Der Einsatz und die Testung von Brandschutzanlagen"],["A", "B", "D"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(10,"Welche Begriffe können sie modernen Cyberangriffen (Malware) zuordnen?",["Würmer", "Viren", "virtuelle Maschinen", "Trojaner"],["A", "B", "D"],"Incident / Cyberangriffe","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(11,"Bei der „Jura Anwalts GmbH“ werden vertrauliche und sensible Informationen der Mandanten per E-Mail verschickt. Eine Veröffentlichung bei Verlust könnte schlimme Folgen mit sich bringen. Das Top Management beauftragt Sie als Informationssicherheitsbeautragten, die höchste Sicherheit der Vertraulichkeit dieser E-Mails zu gewährleisten. Welches ist das einzige Verfahren, welches sicherstellt, dass keine Zwischenstationen (z.B. Mailserver) und nur der Absender/in und der Empfänger/in den Inhalt lesen können?",["Eine Transportverschlüsselung zwischen E-Mail Servern implementieren", "Die End-to-End Verschlüsselung für die E-Mails verwenden (z.B. PGP)", "Den Mailserver immer auf den aktuellen Updatestand halten", "E-Mails nur mit einer bestehenden VPN Verbindung versenden"],["B"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(12,"Wer im Unternehmen muss den Auftrag erteilen, damit ein ISMS (ISO27001) eingeführt werden kann und ist auch für den langfristigen erfolgreich im Unternehmen bleibt?",["ISM", "ISB", "Die IT Abteilung", "Die Unternehmensführung"],["D"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(13,"Unter welchen Voraussetzungen entscheidet sich eine Organisation für die Umsetzung einer Kern-Absicherung?",["Das angestrebte Sicherheitsniveau orientiert sich ausschließlich an wirtschaftlichen Mindestanforderungen", "Es existiert nur eine begrenzte Anzahl besonders schutzbedürftiger Geschäftsprozesse", "Die Organisation verzichtet vollständig auf bestehende Sicherheitsmaßnahmen", "Kritische Prozesse mit erhöhtem Risiko können schnell erkannt und klar voneinander abgegrenzt werden"],["B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(14,"Was beschreibt Multi-Faktor-Authentifizierung (MFA)?",["Kombination mehrerer unabhängiger Faktoren", "Erhöhung der Zugriffssicherheit", "Ausschließliche Nutzung von Passwörtern", "Zusätzliche Absicherung von Benutzerkonten"],["A", "B", "D"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(15,"Die „NovaSecure Systems GmbH“ entwickelt cloudbasierte Geschäftsanwendungen und plant die Einführung eines Informationssicherheitsmanagementsystems nach ISO/IEC 27001. Während der Projektplanung erklärt die Geschäftsführung, dass technische Schutzmaßnahmen allein nicht ausreichen und deshalb auch der sogenannte „Kontext der Organisation“ betrachtet werden muss. Welche Aspekte beschreibt die ISO/IEC 27001 typischerweise als Bestandteil des „Kontexts der Organisation“?",["Analyse interner Themen und Rahmenbedingungen, die Einfluss auf die Organisation haben", "Planung des jährlichen IT-Sicherheitsbudgets als alleiniger Schwerpunkt des ISMS", "Berücksichtigung externer Einflussfaktoren und Anforderungen des Unternehmens", "Operative Verfolgung und Identifikation potenzieller Angreifergruppen"],["A", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(16,"Welche Maßnahmen eignen sich typischerweise, um die Integrität von Informationen sicherzustellen?",["Die ausschließliche Verwendung individueller Benutzerkonten gewährleistet automatisch die Integrität sämtlicher Informationen.", "Spiegelung kritischer Systeme zur Ausfallsicherheit", "Kryptografische Prüfsummen und Hashverfahren", "Automatische Skalierung von Cloud-Ressourcen"],["C"],"Risiko / Schutzziele","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(17,"Welche Aufgaben gehören zum Incident Management?",["Erkennung von Sicherheitsvorfällen", "Koordination von Reaktionen", "Analyse von Ursachen", "Entwicklung von Werbestrategien"],["A", "B", "C"],"Incident / Cyberangriffe","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(18,"Die „SecureVision Solutions GmbH“ bereitet aktuell eine Zertifizierung nach ISO/IEC 27001 vor. Die Geschäftsführung möchte sicherstellen, dass Mitarbeitende, deren Tätigkeiten Einfluss auf die Informationssicherheit haben, über geeignete Kompetenzen verfügen. Welche Maßnahmen fordert die ISO/IEC 27001 im Zusammenhang mit Kompetenzmanagement typischerweise von einer Organisation?",["Geeignete Nachweise über vorhandene Kompetenzen und Qualifikationen dokumentiert aufbewahren", "Kompetenzen ausschließlich bei Führungskräften regelmäßig überprüfen", "Erforderliche Kompetenzen für sicherheitsrelevante Tätigkeiten festlegen, welche unter Aufsicht die Informationssicherheitsleitungen beeinflussen können", "Sicherstellen, dass Mitarbeitende durch Ausbildung, Erfahrung oder Schulungen ausreichend qualifiziert sind"],["A", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(19,"Welche Risiken entstehen durch Schatten-IT?",["Fehlende Kontrolle über Systeme", "Unbekannte Anwendungen im Unternehmen", "Verbesserte zentrale Sicherheitssteuerung", "Erhöhte Angriffsflächen"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(20,"Wie sollte die dokumentierte Information eines Informationsmanagementsystem innerhalb einer Organisation sinnvoll strukturiert und bereitgestellt werden?",["Dokumentierte Informationen sollten grundsätzlich nur in gedruckter Form verwaltet werden", "Der Zugriff auf ISMS-Dokumente sollte ausschließlich der Geschäftsleitung vorbehalten sein", "Inhalte sollten entsprechend ihrer Sensibilität und Schutzbedarfe klassifiziert werden", "Informationen sollten zielgruppenorientiert aufbereitet und den jeweiligen Verantwortungsbereichen passend bereitgestellt werden"],["C", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(21,"Welche Ziele verfolgen Sicherheitskennzahlen (KPIs)?",["Messbarkeit von Sicherheitsmaßnahmen", "Unterstützung von Entscheidungen", "Bewertung von Entwicklungen", "Ersatz von Audits"],["A", "B", "C"],"Kontrolle / Kennzahlen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(22,"Welche Maßnahmen eignen sich, um Systeme auf mögliche unautorisierte Zugriffe oder Manipulationen zu überprüfen?",["Analyse sicherheitsrelevanter Protokolle und Logdateien", "Durchführung allgemeiner Zutrittskontrollen für Besucher", "Vergleich von System- und Registry-Daten mit definierten Referenzwerten", "Überwachung sicherheitskritischer Bereiche durch Videoaufzeichnungen"],["A", "C", "D"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(23,"Was gehört typischerweise zu einem Notfallplan?",["Wiederanlaufmaßnahmen", "Kommunikationswege", "Zuständigkeiten", "Zufällige Maßnahmen ohne Struktur"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(24,"Welche Maßnahmen und Voraussetzungen können im Rahmen einer angestrebten ISO-27001-Zertifizierung auf Basis von BSI IT-Grundschutz relevant sein?",["Erfolgreiche Einleitung und Vorbereitung des Zertifizierungsverfahrens", "Umsetzung einer Sicherheitskonzeption nach Standard-Absicherung", "Umsetzung einer Sicherheitskonzeption nach Kern-Absicherung", "Umsetzung einer ausschließlichen Basis-Absicherung ohne weiterführende Sicherheitsmaßnahmen"],["A", "B", "C"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(25,"Die „FutureSecure Technologies GmbH“ betreibt seit mehreren Jahren ein Informationssicherheitsmanagementsystem (ISMS) nach ISO/IEC 27001. Während eines externen Überwachungsaudits wird festgestellt, dass bestehende Sicherheitsmaßnahmen zwar dokumentiert sind, jedoch kaum an neue Bedrohungen, technische Veränderungen oder organisatorische Entwicklungen angepasst werden. Die Auditor weisen darauf hin, dass ein ISMS dauerhaft weiterentwickelt und regelmäßig überprüft werden muss, um wirksam zu bleiben. Welchem grundlegenden Managementprinzip folgt die ISO/IEC 27001, um eine kontinuierliche Verbesserung und Anpassung des ISMS sicherzustellen?",["Dem hierarchischen Entscheidungsmodell, bei dem ausschließlich die Geschäftsführung Sicherheitsmaßnahmen festlegt", "Dem reinen Kontrollprinzip, das sich ausschließlich auf Audits und Fehleranalysen konzentriert", "Dem risikoorientierten Ansatz ohne regelmäßige Überprüfung bestehender Prozesse", "Dem PDCA-Zyklus (Plan-Do-Check-Act), der Planung, Umsetzung, Kontrolle und Verbesserung miteinander verbindet"],["D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(26,"Welche Aussagen zu Compliance sind korrekt?",["Gesetzliche Anforderungen müssen berücksichtigt werden", "Interne Vorgaben spielen eine Rolle", "Compliance betrifft nur die IT-Abteilung", "Verstöße können rechtliche Folgen haben"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(27,"Nach der Einführung einer Sicherheitsmaßnahme soll deren Wirksamkeit überprüft und bewertet werden. Welche Kriterien sind dabei typischerweise relevant?",["Nachvollziehbare und reproduzierbare Ergebnisse der Bewertung", "Die physische Größe oder das Gewicht der eingesetzten Systeme", "Bewertung innerhalb eines festgelegten Zeitraums oder zu definierten Prüfzeitpunkten", "Dokumentierte Ergebnisse und nachvollziehbare Nachweise der Überprüfung"],["A", "C", "D"],"Kontrolle / Kennzahlen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(28,"Welche Vorteile bietet ein rollenbasiertes Berechtigungskonzept?",["Einheitliche Rechtevergabe", "Bessere Kontrolle von Berechtigungen", "Vereinfachte Verwaltung", "Vollständige Vermeidung von Fehlkonfigurationen"],["A", "B", "C"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(29,"Was versteht man im Bereich der Informationssicherheit unter „Data Leakage“?",["Verletzung der Vertraulichkeit sensibler Daten", "Einschränkung oder Verlust der Systemverfügbarkeit", "Unkontrollierter oder unbeabsichtigter Abfluss vertraulicher Informationen", "Unbemerkte Veränderung von Datenbeständen"],["A", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(30,"Welche Aussagen zu Sicherheitsvorfällen treffen zu?",["Schnelle Reaktion reduziert mögliche Schäden", "Dokumentation unterstützt die Nachbearbeitung", "Sicherheitsvorfälle müssen grundsätzlich geheim gehalten werden", "Ursachenanalysen helfen zukünftige Vorfälle zu vermeiden"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(31,"Welche Maßnahmen und Voraussetzungen können im Rahmen einer angestrebten ISO-27001-Zertifizierung auf Basis von BSI IT-Grundschutz relevant sein?",["Erfolgreiche Einleitung und Vorbereitung des Zertifizierungsverfahrens", "Umsetzung einer Sicherheitskonzeption nach Standard-Absicherung", "Umsetzung einer Sicherheitskonzeption nach Kern-Absicherung", "Umsetzung einer ausschließlichen Basis-Absicherung ohne weiterführende Sicherheitsmaßnahmen"],["A", "B", "C"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(32,"Die „LogiSecure Services GmbH“ plant die Einführung eines Informationssicherheitsmanagementsystems (ISMS) nach dem BSI IT-Grundschutz. Im Rahmen der Vorbereitung soll eine Informations-sicherheitsleitlinie erstellt werden, die als strategische Grundlage für die Informationssicherheit im Unternehmen dient und durch die Geschäftsleitung verabschiedet wird. Welche Inhalte sollte eine Informationssicherheitsleitlinie nach den Empfehlungen des BSI IT-Grundschutzes typischerweise enthalten?",["Detaillierte technische Konfigurationsvorgaben einzelner Sicherheitskomponenten", "Definition des Geltungsbereichs der Informationssicherheit", "Sicherheitsziele der Organisation", "Strategische Ausrichtung der Informationssicherheit"],["B", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(33,"Warum ist kontinuierliche Verbesserung im ISMS wichtig?",["Bedrohungen verändern sich ständig", "Prozesse können optimiert werden", "Sicherheitsmaßnahmen müssen regelmäßig überprüft werden", "Ein ISMS bleibt nach der Einführung automatisch dauerhaft wirksam"],["A", "B", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(34,"Die „FutureEnergy Research GmbH“ entwickelt innovative Technologien im Bereich nachhaltiger Energiesysteme und verarbeitet dabei hochsensible Forschungsdaten, technische Entwürfe und vertrauliche Projektinformationen. Die Daten werden sowohl intern als auch gemeinsam mit externen Partnerunternehmen und Cloud-Diensten genutzt. Um das Schutzziel „Vertraulichkeit“ wirksam umzusetzen, plant das Unternehmen zusätzliche organisatorische und technische Sicherheitsmaßnahmen. Welche Maßnahmen tragen typischerweise besonders zum Schutz vertraulicher Forschungs- und Entwicklungsdaten bei?",["Durchführung regelmäßiger Last- und Performancetests aller Produktivsysteme", "Einführung eines rollenbasierten Berechtigungs- und Zugriffskonzepts nach dem „Need-to-know“-Prinzip", "Etablierung einer strukturierten Datenklassifizierung mit definierten Schutzbedarfen und Kennzeichnungen", "Regelmäßige Security-Awareness-Schulungen zum sicheren Umgang mit sensiblen Informationen und geistigem Eigentum"],["B", "C", "D"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(35,"Die „MediCore Systems GmbH“ verarbeitet sensible Gesundheitsdaten und möchte ihr Informationssicherheitsmanagement verbessern. Im Rahmen einer internen Analyse wird festgestellt, dass Mitarbeitende häufig auf Daten zugreifen können, die sie für ihre eigentliche Tätigkeit nicht benötigen. Welche Maßnahmen unterstützen in diesem Zusammenhang besonders das Prinzip der minimalen Rechtevergabe („Least Privilege“)?",["Automatische Vergabe von Administratorrechten bei Abteilungswechseln", "Regelmäßige Überprüfung und Anpassung bestehender Berechtigungen", "Rollenbasierte Vergabe von Zugriffsrechten entsprechend der tatsächlichen Aufgaben", "Dauerhafte Freigabe gemeinsamer Benutzerkonten zur Vereinfachung der Zusammenarbeit"],["B", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(36,"Die „CloudSecure Logistics AG“ nutzt verschiedene Cloud-Dienste für internationale Lieferkettenprozesse. Während eines Audits wird festgestellt, dass mehrere Cloud-Speicher unbeabsichtigt öffentlich erreichbar sind. Welche Risiken entstehen typischerweise durch Fehlkonfigurationen in Cloud-Umgebungen?",["Unkontrollierter Zugriff auf sensible Informationen", "Erhöhte Verfügbarkeit geschäftskritischer Systeme", "Verletzung von Vertraulichkeit und Datenschutzanforderungen", "Automatische Verbesserung der Netzwerksicherheit"],["A", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(37,"Die „NextGen Manufacturing GmbH“ entwickelt ein Notfallmanagement-Konzept für ihre Produktions- und IT-Systeme. Ziel ist es, auch bei größeren Störungen handlungsfähig zu bleiben und kritische Prozesse schnell wiederherzustellen. Welche Maßnahmen gehören typischerweise zu einer wirksamen Notfallvorsorge?",["Definition klarer Kommunikations- und Eskalationswege", "Regelmäßige Durchführung von Notfallübungen und Tests", "Ausschließliche Konzentration auf technische Schutzmaßnahmen ohne organisatorische Prozesse", "Erstellung von Wiederanlauf- und Wiederherstellungsplänen"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(38,"Welche Normen definieren Anforderungen an Organisationen, die Informationssicherheits-Managementsysteme nach ISO 27001 prüfen und zertifizieren?",["ISO 17021", "ISO 22301", "ISO 27006", "ISO 27003"],["A", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(39,"Was ist ein typisches Ziel von Business Continuity Management (BCM)?",["Aufrechterhaltung kritischer Geschäftsprozesse", "Schnelle Wiederaufnahme wichtiger Abläufe", "Dauerhafte Abschaltung kritischer Systeme", "Reduzierung betrieblicher Ausfallzeiten"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(40,"Die „SecureData Systems GmbH“ verarbeitet vertrauliche Informationen aus den Bereichen Gesundheitswesen, Forschung und Finanzdienstleistungen. Um ein angemessenes Niveau der Informationssicherheit zu etablieren, plant das Unternehmen die Einführung eines Sicherheitskonzepts auf Grundlage des BSI IT-Grundschutzes. Im Rahmen der Planung informiert sich die Geschäftsführung über die unterschiedlichen vorgesehenen Absicherungsstufen des BSI. Welche Absicherungsarten gehören zu den vom BSI IT-Grundschutz vorgesehenen Sicherheitsniveaus?",["Erweiterte Hochsicherheits-Absicherung", "Basis-Absicherung", "Kern-Absicherung", "Standard-Absicherung"],["B", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(41,"Welche Aussagen zu Risikobewertungen sind korrekt?",["Eintrittswahrscheinlichkeit wird betrachtet", "Mögliche Schadenshöhe wird bewertet", "Risiken können vollständig ignoriert werden", "Ergebnisse dienen der Priorisierung von Maßnahmen"],["A", "B", "D"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(42,"Welche Rollen und Funktionen werden vom BSI IT-Grundschutz typischerweise für die Organisation der Informationssicherheit empfohlen?",["Datenschutzbeauftragte:r", "IT-Projektleiter:in", "IT-Sicherheitsbeauftragte:r", "ICS-Informationssicherheitsbeauftragte:r"],["A", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(43,"Welche Risiken entstehen durch fehlende Patch-Management-Prozesse?",["Bekannte Schwachstellen bleiben offen", "Angriffsflächen vergrößern sich", "Systeme werden automatisch sicherer", "Sicherheitsupdates werden verzögert"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(44,"Die „DigitalTrust Finance GmbH“ entwickelt cloudbasierte Zahlungslösungen für mittelständische Unternehmen. Nachdem mehrere Sicherheitsvorfälle in der Branche öffentlich geworden sind und regulatorische Anforderungen zunehmen, beschließt die Geschäftsführung die Einführung eines Informationssicherheitsmanagementsystems (ISMS). Um den Sicherheitsprozess erfolgreich zu starten, muss die Leitungsebene zentrale organisatorische Grundlagen schaffen und ihre Verantwortung klar wahrnehmen. Welche Maßnahmen gehören dabei zu den wesentlichen ersten Schritten der Unternehmensleitung?",["Einführung verpflichtender Passwortwechsel für alle Mitarbeitenden innerhalb der ersten Projektwoche", "Bereitstellung ausreichender personeller, finanzieller und technischer Ressourcen für Aufbau und Betrieb des ISMS", "Die Unternehmensleitung übernimmt die Gesamtverantwortung für Informationssicherheit", "Definition des Geltungsbereichs des ISMS und Festlegung der zu schützenden Bereiche und Informationen"],["B", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(45,"Welche Aussagen zu Cloud-Sicherheit sind korrekt?",["Verantwortlichkeiten müssen klar geregelt sein", "Fehlkonfigurationen stellen ein hohes Risiko dar", "Cloud-Anbieter übernehmen automatisch sämtliche Sicherheitsaufgaben", "Zugriffsrechte bleiben zentral wichtig"],["A", "B", "D"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(46,"Was ist das Ziel einer Schutzbedarfsfeststellung?",["Bewertung der Bedeutung von Informationen und Systemen", "Ermittlung notwendiger Sicherheitsmaßnahmen", "Ersatz technischer Schutzmaßnahmen", "Grundlage für Risikobewertungen"],["A", "B", "D"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(47,"Bei der „SecureNet Consulting GmbH“ wird im Rahmen eines ISMS-Audits überprüft, wie die Rolle des Informationssicherheitsbeauftragten (ISB) im Unternehmen umgesetzt wird. Dabei zeigt sich, dass viele Mitarbeitende den ISB hauptsächlich als technischen Administrator für Firewalls, Server und Netzwerke ansehen. Die Geschäftsführung möchte deshalb klarstellen, welche Aufgaben tatsächlich zum Verantwortungsbereich eines ISB innerhalb eines Informationssicherheitsmanagementsystems gehören. Welche Tätigkeiten zählen typischerweise zu den Aufgaben eines Informationssicherheitsbeauftragten?",["Unterstützung der Leitungsebene bei der Entwicklung der Sicherheitsleitlinie", "Permanente technische Wartung aller Arbeitsplatzrechner und Drucksysteme", "Koordination sicherheitsrelevanter Projekte", "Analyse und Nachverfolgung von Sicherheitsvorfällen"],["A", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(48,"Welche Maßnahmen unterstützen die Verfügbarkeit von Systemen?",["Redundanz", "Backup-Konzepte", "Single Point of Failure", "Notfallplanung"],["A", "B", "D"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(49,"Die „CyberPay Solutions GmbH“ bereitet aktuell die Einführung eines Informationssicherheitsmanagementsystems nach ISO/IEC 27001 vor. Im Rahmen der Auditvorbereitung arbeitet das Projektteam intensiv mit dem Anhang A der Norm, um geeignete Sicherheitsmaßnahmen auszuwählen und umzusetzen. Ein neuer Mitarbeitender ist unsicher, wie die dort aufgeführten sicherheitsbezogenen Vorgaben offiziell bezeichnet werden. Wie werden die im Anhang A der ISO/IEC 27001 aufgeführten Elemente genannt?",["Auditnachweise", "Kontrollen („Controls“), umgangssprachlich häufig auch Sicherheitsmaßnahmen genannt", "Sicherheitsrichtlinienebenen", "Compliance-Kategorien"],["B"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(50,"Welche Aspekte gehören typischerweise zur physischen Sicherheit?",["Zutrittskontrollen", "Schutz vor Brandgefahren", "Netzwerkverschlüsselung", "Videoüberwachung"],["A", "B", "D"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(51,"Warum sind regelmäßige Backups wichtig?",["Wiederherstellung nach Ausfällen", "Unterstützung des Notfallmanagements", "Schutz vor Datenverlust", "Vollständige Vermeidung von Cyberangriffen"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(52,"Welche Dokumentarten zählen typischerweise zur sogenannten Richtlinien-Pyramide im Informationssicherheitsmanagement?",["Informationssicherheitspolitik", "Schulungsnachweise", "Richtlinien", "Wartungsprotokolle"],["A", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(53,"Welche Informationen und Unterlagen sollten im Rahmen einer Managementbewertung nach ISO/IEC 27001 berücksichtigt werden?",["Ergebnisse bereits durchgeführter interner Audits", "Frühere Managementbewertungen und deren Ergebnisse", "Marketing- und Vertriebsstrategien des Unternehmens", "Relevante interne sowie externe Veränderungen"],["A", "B", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(54,"Welche Probleme entstehen durch fehlende Dokumentation?",["Sicherheitsrelevante Prozesse und Entscheidungen sind nur schwer nachvollziehbar.", "Wissen über Systeme und Abläufe kann beim Ausscheiden von Mitarbeitenden verloren gehen.", "Audits und die Überprüfung von Sicherheitsmaßnahmen werden erschwert.", "Die Verfügbarkeit und Sicherheit von IT-Systemen wird automatisch verbessert."],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(55,"Was beschreibt der Begriff „Data Loss“ im Kontext der Informationssicherheit?",["Bewusste oder unbeabsichtigte Löschung bzw. Verlust von Daten", "Beeinträchtigung der Datenintegrität", "Einschränkung oder Verlust der Verfügbarkeit von Informationen", "Automatische Verschlüsselung sensibler Daten durch Sicherheitssysteme"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(56,"Welche Empfehlungen werden im IT-Grundschutz für den Aufbau einer Informationssicherheitsorganisation genannt?",["Die Leitung der IT-Sicherheit sollte ausschließlich extern vergeben werden", "Die Größe der IT-Sicherheitsabteilung richtet sich nach Umfang und Struktur des Unternehmens", "Der oder die Informationssicherheitsbeauftragte sollte organisatorisch als Stabsstelle angesiedelt sein", "Der oder die Informationssicherheitsbeauftragte übernimmt gleichzeitig automatisch die Leitung der gesamten IT-Abteilung"],["B", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(57,"Warum ist Security Awareness für Unternehmen wichtig?",["Mitarbeitende erkennen Risiken schneller", "Menschliche Fehler können reduziert werden", "Awareness ersetzt technische Schutzmaßnahmen vollständig", "Sicherheitsbewusstsein wird gestärkt"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(58,"Welche Aussagen treffen auf Kündigungsfristen von IT-Sicherheitsbeauftragten zu?",["IT-Sicherheitsbeauftragte besitzen automatisch lebenslangen Kündigungsschutz", "Für IT-Sicherheitsbeauftragte gilt grundsätzlich eine feste Kündigungsfrist von 24 Monaten", "Neben der gesetzlichen Kündigungsfrist können zusätzliche vertragliche Regelungen vereinbart werden", "Es gelten die allgemeinen gesetzlichen Kündigungsfristen"],["C", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(59,"Welche Aufgaben gehören typischerweise zum Verantwortungsbereich von IT-Sicherheitsbeauftragten?",["Eigenständige Freigabe sämtlicher Budgets der IT-Sicherheitsorganisation", "Koordination von Meldungen und Reaktionen auf Informationssicherheitsvorfälle einschließlich Ursachenanalysen", "Durchführung und Begleitung von Audits", "Alleinige Entscheidung über die Auswahl des eingesetzten ISMS"],["B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(60,"Welche Aussagen zu Social Engineering treffen zu?",["Angriffe nutzen menschliches Verhalten aus", "Ziel ist häufig Informationsgewinnung", "Ausschließlich technische Systeme sind betroffen", "Täuschung spielt häufig eine zentrale Rolle"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(61,"Was beschreibt das Prinzip der „Defense in Depth“?",["Kombination mehrerer Schutzmaßnahmen", "Aufbau mehrerer Sicherheitsebenen", "Verzicht auf organisatorische Maßnahmen", "Erhöhung der Widerstandsfähigkeit gegen Angriffe"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(62,"Sie sind Informationssicherheitsbeauftragte:r eines E-Commerce-Unternehmens, das nach ISO/IEC 27001 zertifiziert ist. Während eines Überwachungsaudits wird festgestellt, dass vorgeschriebene Berechtigungsprüfungen für mehrere Cloud-Zugänge nicht vollständig durchgeführt wurden. Um die Konformität des ISMS aufrechtzuerhalten, muss angemessen auf diese Nichtkonformität reagiert werden. Welche Vorgehensweise entspricht den Anforderungen der ISO/IEC 27001?",["Die Abweichung lediglich intern vermerken und erst beim nächsten Audit erneut betrachten", "Geeignete Korrekturmaßnahmen einleiten, die Ursache beheben und die Wirksamkeit der Maßnahmen überprüfen", "Die Nichtkonformität automatisch als akzeptiertes Restrisiko einstufen, solange kein Sicherheitsvorfall bekannt ist", "Maßnahmen erst dann umsetzen, wenn ähnliche Probleme erneut auftreten"],["B"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(63,"Welche Zielsetzungen spielen im Rahmen des BSI eines Informationssicherheitskonzepts eine zentrale Rolle?",["Menschen vor körperlichen und psychischen Beeinträchtigungen schützen", "Gesetzliche sowie regulatorische Anforderungen berücksichtigen", "Wichtige und schwer ersetzbare Informationswerte absichern", "Sämtliche Unternehmensprozesse müssen identisch abgesichert werden"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(64,"Welche Maßnahmen unterstützen das Prinzip „Least Privilege“?",["Vergabe minimal notwendiger Rechte", "Regelmäßige Überprüfung von Berechtigungen", "Automatische Administratorrechte für neue Benutzer", "Rollenbasierte Zugriffskonzepte"],["A", "B", "D"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(65,"Unter welchen Bedingungen ist für eine Organisation die Umsetzung der Standard-Absicherung sinnvoll?",["Die Standard-Absicherung eignet sich nur für internationale Großkonzerne mit eigener Sicherheitsabteilung", "In der Organisation wird sich bereits mit dem IT-Grundschutz beschäftigt", "Die Einführung eines ISMS ist nur möglich, wenn zuvor eine vollständige ISO-Zertifizierung erfolgt ist", "Bereits vorhandene Sicherheitskonzepte orientieren sich an IT-Grundschutz oder ISO 27001"],["B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(66,"Welche Ziele verfolgt ein Informationssicherheitsmanagementsystem (ISMS)?",["Schutz von Informationen und Prozessen", "Sicherstellung strukturierter Sicherheitsprozesse", "Vollständige Abschaffung von Risiken", "Unterstützung kontinuierlicher Verbesserung"],["A", "B", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(67,"Welche Maßnahmen sollten nach der Freigabe einer Sicherheitsleitlinie gemäß BSI IT-Grundschutz durchgeführt werden?",["Die Sicherheitsleitlinie dient ausschließlich internen Revisionszwecken und wird nicht weiter verwendet", "Die Inhalte der Sicherheitsleitlinie müssen regelmäßig überprüft und bei Bedarf angepasst werden", "Nach der Veröffentlichung verliert die Sicherheitsleitlinie ihre strategische Bedeutung", "Die Sicherheitsleitlinie sollte innerhalb der Organisation kommuniziert werden und geläufig sein"],["B", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(68,"Sie übernehmen die Rolle des ISB bei der „NetSecure Solutions GmbH“, einem mittelständischen Unternehmen mit Fokus auf digitale Verwaltungsplattformen für öffentliche Einrichtungen. Aufgrund steigender regulatorischer Anforderungen plant die Unternehmensleitung die Einführung eines Informationssicherheitsmanagementsystems (ISMS) auf Basis des BSI IT-Grundschutzes. Zu Beginn soll ein strukturierter Sicherheitsprozess entwickelt und organisatorisch vorbereitet werden. Welche Maßnahmen gehören dabei zur grundlegenden Planung und Konzeption des Sicherheitsprozesses?",["Relevante interne sowie externe Einflussfaktoren und Rahmenbedingungen analysieren", "Die Priorisierung der Informationssicherheit ausschließlich anhand von Marktanalysen durchführen", "Ziele der Informationssicherheit definieren", "Verantwortliche Personen für Geschäftsbereiche und Fachaufgaben festlegen"],["A", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(69,"Welche Faktoren beeinflussen den Schutzbedarf von Informationen?",["Gesetzliche Anforderungen", "Auswirkungen eines Datenverlustes", "Persönliche Vorlieben einzelner Mitarbeitender", "Bedeutung für Geschäftsprozesse"],["A", "B", "D"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(70,"Was beschreibt das Schutzziel „Integrität“ am besten?",["Informationen stehen jederzeit zur Verfügung", "Informationen bleiben unverändert und korrekt", "Daten dürfen nur verschlüsselt gespeichert werden", "Systeme sind besonders leistungsfähig"],["B"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(71,"Die „DataCore Consulting AG“, ein Unternehmen für digitale Geschäftsprozesse im Gesundheitswesen, führt aktuell ein Informationssicherheitsmanagementsystem (ISMS) nach BSI IT-Grundschutz ein. Während der Umsetzung zeigt sich, dass Verantwortlichkeiten zwischen IT, Datenschutz und Fachabteilungen nicht eindeutig geregelt sind. Dadurch entstehen Abstimmungsprobleme und sicherheitsrelevante Aufgaben bleiben teilweise unbearbeitet. Die Unternehmensleitung möchte deshalb verbindliche Zuständigkeiten und klare Rollen im Bereich Informationssicherheit festlegen. Welche Grundsätze sind dabei nach dem BSI IT-Grundschutz besonders relevant?",["Für die Koordination und Unterstützung des Informationssicherheitsprozesses sollte mindestens eine verantwortliche Person benannt werden", "Sicherheitsentscheidungen dürfen ausschließlich durch externe Dienstleister getroffen werden", "Die oberste Leitung bleibt weiterhin für eine sichere und ordnungsgemäße Aufgabenerfüllung verantwortlich", "Mitarbeitende tragen Mitverantwortung für Informationssicherheit an ihrem Arbeitsplatz und in ihrem Arbeitsumfeld"],["A", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(72,"Warum stellen gemeinsame Benutzerkonten ein Sicherheitsproblem dar?",["Aktionen sind schwer nachvollziehbar", "Verantwortlichkeiten verschwimmen", "Sie erhöhen automatisch die Verfügbarkeit", "Missbrauch kann schlechter erkannt werden"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(73,"Welche Aufgaben gehören typischerweise zum Schwachstellenmanagement?",["Erkennen technischer Schwächen", "Bewertung von Risiken", "Behebung identifizierter Schwachstellen", "Entwicklung von Marketingkampagnen"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(74,"Die „CloudNova Solutions GmbH“, ein junges Unternehmen im Bereich KI-gestützter Unternehmenssoftware, plant die Einführung eines Informationssicherheitsmanagementsystems (ISMS) nach ISO/IEC 27001. Innerhalb der Geschäftsführung wird diskutiert, wie viele personelle und finanzielle Ressourcen langfristig für die Informationssicherheit eingeplant werden müssen. Einige Verantwortliche sehen Informationssicherheit lediglich als einmaliges Projekt, andere als dauerhaften Managementprozess. Für welche Zwecke sollten gemäß ISO/IEC 27001 geeignete Ressourcen bereitgestellt werden?",["Für die dauerhafte Weiterentwicklung und Optimierung des ISMS", "Für die Einführung und Umsetzung eines ISMS", "Für den laufenden Betrieb und die Aufrechterhaltung des ISMS", "Ausschließlich zur Erstellung von Auditberichten für externe Prüfer"],["A", "B", "C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(75,"Die „DataSphere Hosting GmbH“ betreibt eine Virtualisierungsplattform für unterschiedliche Kund:innen aus Wirtschaft und Forschung. Auf einem zentralen Host-System laufen mehrere virtuelle Server mit verschieden hohen Anforderungen an die Informationssicherheit. Dazu zählen unter anderem ein internes Wiki eines kleinen Unternehmens (Schutzbedarf: normal), ein System zur Verarbeitung sensibler Gesundheitsdaten (Schutzbedarf: hoch) sowie eine Anwendung für kritische Zahlungsprozesse im Finanzbereich (Schutzbedarf: sehr hoch). Im Rahmen einer Schutzbedarfsanalyse nach BSI IT-Grundschutz soll nun der Schutzbedarf des zugrunde liegenden physischen Servers bestimmt werden. Wie wird hierbei das Maximumprinzip angewendet?",["Der Schutzbedarf des Servers richtet sich primär nach der Anzahl der betriebenen virtuellen Maschinen", "Die Schutzbedarfseinstufung erfolgt getrennt für Hardware und Anwendungen ohne gegenseitige Abhängigkeit", "Der physische Server übernimmt den jeweils höchsten Schutzbedarf der darauf betriebenen Anwendungen", "Der höchste Schutzbedarf wird nur berücksichtigt, wenn mehrere Systeme identische Schutzklassen besitzen"],["C"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(76,"Ein mittelständisches Softwareunternehmen plant den Aufbau eines neuen Technikraums für zentrale Server- und Netzwerksysteme. Ziel ist es, die eingesetzte Hardware möglichst umfassend vor äußeren Einwirkungen und Beschädigungen zu schützen. Im Rahmen der Sicherheitsplanung wird geprüft, gegen welche Arten von Gefahren physische Schutzmaßnahmen in erster Linie wirken sollen. Welche Bedrohungen stehen dabei im Fokus?",["Mechanische Einwirkungen durch Personen oder Gegenstände", "Unzureichende Benutzerfreundlichkeit von Softwareoberflächen", "Korrosive oder gasförmige Umwelteinflüsse", "Einschleusen oder Einbringen schädlicher Stoffe"],["A", "C", "D"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(77,"Warum sind regelmäßige Audits wichtig?",["Überprüfung der Wirksamkeit von Maßnahmen", "Erkennen von Abweichungen", "Ersatz für Sicherheitsmaßnahmen", "Unterstützung kontinuierlicher Verbesserung"],["A", "B", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(78,"Welche Aussagen zu Sicherheitsrichtlinien sind korrekt?",["Sie definieren verbindliche Vorgaben", "Sie schaffen Orientierung für Mitarbeitende", "Sie ersetzen technische Schutzmaßnahmen vollständig", "Sie unterstützen einheitliche Prozesse"],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(79,"Die „HealthCloud Systems AG“ entwickelt digitale Lösungen für Arztpraxen und Krankenhäuser. Um flexibler aufsteigende Anforderungen reagieren zu können, sollen verschiedene IT-Dienste zukünftig über externe Cloud-Anbieter betrieben werden. Im Rahmen der Sicherheitsbewertung orientiert sich das Unternehmen am BSI IT-Grundschutz, insbesondere am Baustein zur sicheren Nutzung von Cloud-Diensten. Welche Arten von Cloud-Servicemodellen stehen dabei typischerweise im Mittelpunkt der Betrachtung?",["Klassische Desktop-Anwendungen ohne externe Bereitstellung", "Software as a Service (SaaS)", "Plattform as a Service (PaaS)", "Infrastructure as a Service (IaaS)"],["B", "C", "D"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(80,"Welche Möglichkeiten eignen sich, um die IT-Sicherheitskultur innerhalb einer Organisation zu bewerten oder messbar zu machen?",["Interne Kennzahlen wie gemeldete Phishing-Vorfälle oder Teilnahme- und Klickraten bei Awareness-Maßnahmen", "Die Anzahl installierter Software und Hardwarelösungen", "Rückmeldungen und Selbsteinschätzungen der Mitarbeitenden", "Jahresumsätze vergleichbarer Unternehmen der Branche"],["A", "C"],"Kontrolle / Kennzahlen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(81,"Welche der folgenden Kürzel kennzeichnen offizielle Bausteingruppen im BSI IT-Grundschutz-Kompendium?",["NeT", "SYS", "ROS", "INF"],["B", "D"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(82,"Die „NeuroTech Analytics GmbH“ entwickelt datenbasierte KI-Lösungen für Forschungseinrichtungen, Versicherungen und Industrieunternehmen. Dabei verarbeitet das Unternehmen unterschiedlich sensible Informationen – darunter personenbezogene Gesundheitsdaten, proprietäre Entwicklungsunterlagen, interne Finanzinformationen sowie Forschungs- und Projektdokumentationen. Da bislang keine einheitlichen Vorgaben zur Einstufung und Handhabung dieser Daten existieren, soll nun eine verbindliche Datenklassifizierungsrichtlinie eingeführt werden. Ziel ist es, Mitarbeitenden klare Vorgaben zum Umgang mit sensiblen Informationen zu geben und Schutzmaßnahmen nachvollziehbar festzulegen. Welche Inhalte sollten in einer solchen Richtlinie zwingend enthalten sein?",["Eindeutige Regelungen zu Zuständigkeiten und Verantwortlichkeiten bei der Datenklassifizierung", "Vollständige private Kommunikationsdaten aller Mitarbeitenden", "Beschreibung der angestrebten Schutzziele im Umgang mit Informationen", "Definition von Klassifizierungsstufen mit nachvollziehbaren Kriterien und möglichen Auswirkungen bei Verlust oder Missbrauch der Daten"],["A", "C", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(83,"Welche Aussagen sind im Zusammenhang mit dem BSI-Baustein OPS.2.2 „Cloud-Nutzung“ zu berücksichtigen?",["Die Verantwortung für Sicherheitsvorfälle liegt vollständig beim Cloud-Provider", "Für jeden eingesetzten Cloud-Anbieter sollte der Baustein separat betrachtet werden", "In Cloud-Umgebungen eingesetzte Assets müssen vergleichbar zu On-Premis Systemen modelliert werden", "An Übergängen zwischen eigenem Verantwortungsbereich und Cloud-Dienstleister sind Zuständigkeiten klar zu berücksichtigen"],["B", "C", "D"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(84,"Welche Maßnahmen tragen typischerweise dazu bei, das Schutzziel Verfügbarkeit in der Informationssicherheit zu gewährleisten?",["Redundante Systeme und Komponenten einsetzen", "Endpoint Security mit integrierter Firewall", "Datensicherungen und Wiederherstellungsmöglichkeiten vorhalten", "Sicherheitsvorfälle ausschließlich manuell und ohne Automatisierung bearbeiten"],["A", "C"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(85,"Was beschreibt eine Bedrohung im Kontext der Informationssicherheit?",["Eine mögliche Ursache für Schäden", "Eine technische Sicherheitsmaßnahme", "Eine potenzielle Gefährdung von Informationen", "Ein abgeschlossener Sicherheitsvorfall"],["A", "C"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(86,"Welche Vorteile bietet eine Netzwerksegmentierung?",["Die Ausbreitung von Cyberangriffen innerhalb eines Netzwerks kann begrenzt werden.", "Unterschiedliche Netzwerkbereiche können durch gezielte Zugriffskontrollen voneinander getrennt werden.", "Durch Netzwerksegmentierung werden sämtliche Sicherheitsrisiken innerhalb eines Unternehmens vollständig beseitigt.", "Kritische Systeme und sensible Daten können durch eine gezielte Trennung besser geschützt werden."],["A", "B", "D"],"Überarbeitete Fragen","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(87,"Die „FinSecure Solutions AG“ betreibt IT-Dienstleistungen für Banken und Versicherungen und möchte ihr Informationssicherheitsmanagementsystem nach ISO/IEC 27001 weiter ausbauen. Besonders im Fokus steht dabei der sichere Umgang mit Mitarbeitenden während des gesamten Beschäftigungszyklus. Die Unternehmensleitung möchte sicherstellen, dass Risiken durch menschliches Fehlverhalten (Personalsicherheit gemäß ISO/IEC 27001:2022, Anhang A.6 (in der Normversion 2013 unter A.7 geführt)) oder mangelndes Sicherheitsbewusstsein möglichst reduziert werden. Welche Maßnahmenbereiche werden im Rahmen der Personalsicherheit nach ISO/IEC 27001 besonders berücksichtigt?",["Mitarbeitende dürfen sicherheitsrelevante Vorgaben eigenständig und ohne Abstimmung verändern", "Sicherheitsmaßnahmen und Regelungen vor Beginn der Beschäftigung", "Sicherheitsrelevante Maßnahmen während des laufenden Beschäftigungsverhältnisses", "Maßnahmen bei Änderungen oder Beendigung des Beschäftigungsverhältnisses"],["B", "C", "D"],"ISMS / ISO 27001","Quelle: Fehlerabgleich.docx. Diese Frage wurde gezielt aus dem Fehlerabgleich übernommen; im Übungsmodus muss die Auswahl exakt vollständig sein."),
+      q(88,"Was ist das primäre Ziel von IT-Sicherheit?",["Maximierung der Systemleistung", "Schutz von Informationen vor Missbrauch, Verlust und Manipulation", "Reduzierung von Hardwarekosten", "Vereinfachung von IT-Prozessen"],["B"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(89,"Welche Aussage beschreibt IT-Sicherheit korrekt?",["Sie ist ausschließlich technisch", "Sie betrifft nur die IT-Abteilung", "Sie umfasst Technik, Prozesse und Menschen", "Sie ist optional"],["C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(90,"Welche Prozesse gehören zu den Kernprozessen der IT-Sicherheit?",["Risikomanagement", "Incident Management", "Notfallmanagement", "Finanzmanagement"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(91,"Was ist das Hauptziel des Incident Managements?",["Systeme entwickeln", "Sicherheitsvorfälle erkennen und behandeln", "Benutzerkonten verwalten", "Daten archivieren"],["B"],"Incident / Cyberangriffe","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(92,"Wer trägt die Gesamtverantwortung für IT-Sicherheit?",["IT-Abteilung", "Mitarbeitende", "Geschäftsleitung", "externe Dienstleister"],["C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(93,"Was ist eine Maßnahme der physischen Sicherheit?",["Passwort Policy", "Firewall", "Zutrittskontrolle", "Antivirus"],["C"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(94,"Welche sind Umweltgefahren?",["Feuer", "Wasser", "Stromausfall", "Phishing"],["A", "B", "C"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(95,"Was ist der Unterschied zwischen Identität und Benutzerkonto?",["Kein Unterschied", "Identität = Person, Konto = technisch", "Konto ist wichtiger", "Identität = Passwort"],["B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(96,"Welche Methoden gehören zur Authentifizierung?",["Passwort", "Fingerabdruck", "Einmalcode", "Benutzerrolle"],["A", "B", "C"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(97,"Was beschreibt Autorisierung?",["Identitätsprüfung", "Rechtevergabe", "Netzwerkverbindung", "Datenspeicherung"],["B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(98,"Welche Schutzziele gehören zur IT-Sicherheit?",["Vertraulichkeit", "Geschwindigkeit", "Integrität", "Verfügbarkeit"],["A", "C", "D"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(99,"Wer trägt die Gesamtverantwortung für IT-Sicherheit im Unternehmen?",["IT-Abteilung", "ISB", "Geschäftsführung", "Mitarbeitende"],["C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(100,"Welche Rollen sind typischerweise an IT-Sicherheit beteiligt?",["Geschäftsführung", "ISB", "IT-Abteilung", "Marketing-Agentur"],["A", "B", "C"],"Überarbeitete Fragen","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(101,"Was beschreibt ein ISMS?",["Ein einzelnes Sicherheitstool", "Ein strukturiertes Managementsystem für IS (Information Security) -Sicherheit", "Eine Firewall", "Ein Backup-System"],["B"],"ISMS / ISO 27001","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(102,"Was bedeutet „Verfügbarkeit“?",["Daten sind geheim", "Daten sind korrekt", "Systeme sind nutzbar, wenn sie gebraucht werden", "Daten sind verschlüsselt"],["C"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(103,"Was bedeutet Authentifizierung?",["Festlegen von Rechten", "Prüfen der Identität", "Daten verschlüsseln", "Systeme sichern"],["B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(104,"Welche Methoden gehören zur Authentifizierung?",["Passwort", "Biometrie", "Benutzerrolle", "Firewall"],["A", "B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(105,"Was beschreibt Autorisierung?",["Wer sich anmeldet", "Was ein Benutzer tun darf", "Wie Daten gespeichert werden", "Wie Systeme gesichert werden"],["B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(106,"Welche Aussagen zu IAM sind korrekt?",["Regelt Zugriff auf Systeme", "Jeder bekommt automatisch Zugriff", "Nur berechtigte Personen erhalten Zugriff", "Ist Grundlage der IT-Sicherheit"],["A", "C", "D"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(107,"Was bedeutet „Least Privilege“?",["Alle haben volle Rechte", "Benutzer erhalten nur notwendige Rechte", "Rechte werden zufällig vergeben", "Rechte werden nicht kontrolliert"],["B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(108,"Welche typischen IAM-Probleme gibt es?",["Zu viele Rechte", "Fehlende Kontrolle", "Gute Dokumentation", "Intransparenz"],["A", "B", "D"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(109,"Warum ist physische Sicherheit wichtig?",["Sie ersetzt Software", "Physischer Zugriff kann technische Schutzmaßnahmen umgehen", "Sie ist nur für Server relevant", "Sie betrifft nur große Unternehmen"],["B"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(110,"Welche physischen Gefahren gibt es?",["Diebstahl", "Sabotage", "Wasserschäden", "Softwarefehler"],["A", "B", "C"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(111,"Was beschreibt Tailgating?",["Passwortdiebstahl", "Mitgehen ohne Berechtigung", "Datenverschlüsselung", "Backup"],["B"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(112,"Welche Maßnahmen schützen vor Diebstahl?",["Zutrittskontrollen", "Geräte sichern", "Daten verschlüsseln", "Passwörter abschaffen"],["A", "B", "C"],"Physische Sicherheit / Cloud","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(113,"Wie entsteht ein Risiko?",["Nur durch Schaden", "Nur durch Wahrscheinlichkeit", "Kombination aus Wahrscheinlichkeit und Schaden", "durch Zufall"],["C"],"Risiko / Schutzziele","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(114,"Was ist das Ziel von Multi-Faktor-Authentifizierung?",["Anmeldung beschleunigen", "Sicherheit durch mehrere Faktoren erhöhen", "Passwörter ersetzen", "Systeme vereinfachen"],["B"],"IAM / Zugriff","Quelle: Überarbeitete Quizfragen.docx. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte.")
+    ];
+    function q(n, question, texts, correct, topic, explanation) {
+      if (texts.length !== 4) throw new Error(`Frage ${n}: genau 4 Antwortmöglichkeiten erforderlich.`);
+      if (correct.length < 1) throw new Error(`Frage ${n}: mindestens 1 richtige Antwort erforderlich.`);
+      if (correct.length > 3) throw new Error(`Frage ${n}: maximal 3 richtige Antworten erlaubt.`);
+      if (correct.some((id) => !["A", "B", "C", "D"].includes(id))) throw new Error(`Frage ${n}: richtige Antworten dürfen nur A bis D sein.`);
+      return { id: `q${String(n).padStart(2,"0")}`, number: n, question, topic, explanation, type: "choice", options: texts.map((text, i) => ({ id: String.fromCharCode(65 + i), text, correct: correct.includes(String.fromCharCode(65 + i)) })) };
+    }
+    const STORE_KEY = "it_security_beauftragte_revised_questions_v3";
+    const APP_VERSION = "1.4.2";
+    const DEFAULTS = { count: 25, examMinutes: 30, secondsPerQuestion: 0, passPercent: 70, shuffleQuestions: true, shuffleAnswers: false, noBack: false, topic: "Alle", theme: "light" };
+    const PROFILES = { custom:null, short:{count:20, examMinutes:20, secondsPerQuestion:0, passPercent:70}, week:{count:40, examMinutes:45, secondsPerQuestion:0, passPercent:70}, full:{count:80, examMinutes:90, secondsPerQuestion:0, passPercent:70} };
+    const state = { view: "dashboard", settings: {...DEFAULTS}, history: [], customQuestions: [], notes: {}, disabledIds: [], uncertainIds: [], importReports: [], practice: null, exam: null, repeatIds: [], timer: null };
+    const $ = (sel) => document.querySelector(sel);
+    const app = $("#app");
+    const title = $("#title");
+    load();
+    applyTheme();
+    render("dashboard");
+    document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => render(btn.dataset.view)));
+    $("#menu").addEventListener("click", () => $("#sidebar").classList.toggle("open"));
+    $("#theme").addEventListener("click", () => { state.settings.theme = state.settings.theme === "dark" ? "light" : "dark"; save(); applyTheme(); });
+    document.addEventListener("keydown", handleKeys);
+    function load() {
+      try { Object.assign(state, JSON.parse(localStorage.getItem(STORE_KEY)) || {}); } catch {}
+      state.settings = {...DEFAULTS, ...(state.settings || {})};
+      state.repeatIds = state.repeatIds || [];
+      state.history = state.history || [];
+      state.customQuestions = state.customQuestions || [];
+      state.notes = state.notes || {};
+      state.disabledIds = state.disabledIds || [];
+      state.uncertainIds = state.uncertainIds || [];
+      state.importReports = state.importReports || [];
+    }
+    function save() {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ settings: state.settings, history: state.history, repeatIds: state.repeatIds, customQuestions: state.customQuestions, notes: state.notes, disabledIds: state.disabledIds, uncertainIds: state.uncertainIds, importReports: state.importReports }));
+    }
+    function applyTheme() { document.documentElement.dataset.theme = state.settings.theme; }
+    function render(view) {
+      clearInterval(state.timer);
+      state.view = view;
+      document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+      $("#sidebar").classList.remove("open");
+      const names = {dashboard:"Dashboard", practice:"Üben", exam:"Prüfung", questions:"Fragenbank", analysis:"Lernanalyse", settings:"Einstellungen"};
+      title.textContent = names[view];
+      ({dashboard, practice, exam, questions, analysis, settings}[view])();
+      app.focus({preventScroll:true});
+    }
+    function dashboard() {
+      const bank = questionBank();
+      const exams = state.history.filter(h => h.mode === "exam");
+      const practices = state.history.filter(h => h.mode === "practice");
+      const last = exams.at(-1);
+      const avg = exams.length ? Math.round(exams.reduce((s,h)=>s+h.percent,0)/exams.length) : 0;
+      const weak = weakTopics().slice(0,3);
+      app.innerHTML = `
+        <section class="grid cols-3">
+          ${metric("Fragen im Katalog", bank.length, `${DEFAULT_QUESTIONS.length} Original · ${state.customQuestions.length} eigene`)}
+          ${metric("Prüfungsschnitt", exams.length ? avg + "%" : "—", `${exams.length} Simulationen`)}
+          ${metric("Fehlerwiederholung", state.repeatIds.length, "gezielt fällige Fragen")}
+        </section>
+        <section class="card pad section"><h2>Fragenbestand</h2><p><strong>Version ${APP_VERSION}</strong> · ${bank.length} Fragen · ${topics().length} Themenbereiche</p></section>
+        <section class="grid cols-2 section">
+          <div class="card pad"><h2>Schnellstart</h2><p class="muted">Wähle Üben für sofortige Rückmeldung oder Prüfung für eine realistische Simulation ohne Hinweise.</p><div class="button-row"><button class="button" onclick="render('practice')">Üben starten</button><button class="button secondary" onclick="render('exam')">Prüfung starten</button><button class="button ghost" onclick="startRepeat()">Fehler wiederholen</button></div></div>
+          <div class="card pad"><h2>Letzte Prüfung</h2>${last ? resultMini(last) : `<p class="muted">Noch keine Prüfung absolviert.</p>`}</div>
+        </section>
+        <section class="card pad section"><h2>Lernfokus</h2>${weak.length ? weak.map(w => `<p><strong>${w.topic}</strong>: ${w.rate}% richtig aus ${w.total} beantworteten Fragen</p>`).join("") : `<p class="muted">Noch keine Schwächen erkennbar. Starte mit dem Übungsmodus.</p>`}</section>
+        <section class="card pad section"><h2>Lernziele pro Woche</h2><div class="list section">${weekGoals()}</div></section>`;
+    }
+    function practice() {
+      app.innerHTML = settingsPanel("practice") + `<section id="run" class="section"></section>`;
+      bindProfile();
+      $("#start-practice").addEventListener("click", () => startPractice());
+    }
+    function exam() {
+      app.innerHTML = settingsPanel("exam") + `<section id="run" class="section"></section>`;
+      bindProfile();
+      $("#start-exam").addEventListener("click", () => startExam());
+    }
+    function settingsPanel(mode) {
+      const topicOptions = ["Alle", ...topics()].map(t => `<option value="${escapeHtml(t)}" ${state.settings.topic === t ? "selected" : ""}>${escapeHtml(t)}</option>`).join("");
+      return `<section class="card pad"><h2>${mode === "exam" ? "Prüfungssimulation konfigurieren" : "Übungsrunde konfigurieren"}</h2><div class="setting-grid section">
+        <label>Profil<select id="profile"><option value="custom">Benutzerdefiniert</option><option value="short">Kurztest · 20/20</option><option value="week">Wochenprüfung · 40/45</option><option value="full">Vollsimulation · 80/90</option></select></label>
+        <label>Thema<select id="topic">${topicOptions}</select></label>
+        <label>Fragenanzahl<input id="count" type="number" min="1" max="${filteredBank().length || questionBank().length}" value="${Math.min(state.settings.count, filteredBank().length || questionBank().length)}"></label>
+        <label>Gesamtzeit Minuten<input id="minutes" type="number" min="1" max="240" value="${state.settings.examMinutes}"></label>
+        <label>Zeit pro Frage Sekunden<input id="perq" type="number" min="0" max="900" value="${state.settings.secondsPerQuestion}"></label>
+        <label>Bestehensgrenze %<input id="pass" type="number" min="1" max="100" value="${state.settings.passPercent}"></label>
+      </div><div class="button-row section">
+        <label class="checkline"><input id="shuffle-q" type="checkbox" ${state.settings.shuffleQuestions ? "checked" : ""}> Fragen mischen</label>
+        <label class="checkline"><input id="shuffle-a" type="checkbox" ${state.settings.shuffleAnswers ? "checked" : ""}> Antworten mischen</label>
+        ${mode === "exam" ? `<label class="checkline"><input id="no-back" type="checkbox" ${state.settings.noBack ? "checked" : ""}> Keine Rücknavigation</label>` : ""}
+        <button class="button" id="${mode === "exam" ? "start-exam" : "start-practice"}">${mode === "exam" ? "Prüfung starten" : "Üben starten"}</button>
+      </div></section>`;
+    }
+    function bindProfile() {
+      $("#profile")?.addEventListener("change", (event) => {
+        const p = PROFILES[event.target.value];
+        if (!p) return;
+        $("#count").value = Math.min(p.count, filteredBank().length || questionBank().length);
+        $("#minutes").value = p.examMinutes;
+        $("#perq").value = p.secondsPerQuestion;
+        $("#pass").value = p.passPercent;
+      });
+      $("#topic")?.addEventListener("change", (event) => {
+        state.settings.topic = event.target.value;
+        $("#count").max = filteredBank().length || questionBank().length;
+        $("#count").value = Math.min(+$("#count").value, +$("#count").max);
+      });
+    }
+    function readRunSettings() {
+      const profile = $("#profile")?.value || "custom";
+      if (PROFILES[profile]) Object.assign(state.settings, PROFILES[profile]);
+      const selectedTopic = $("#topic")?.value || "Alle";
+      const maxCount = selectedTopic === "Alle" ? questionBank().length : questionBank().filter(q => q.topic === selectedTopic).length;
+      Object.assign(state.settings, {
+        topic: selectedTopic,
+        count: clamp(+$("#count").value, 1, maxCount || questionBank().length),
+        examMinutes: clamp(+$("#minutes").value, 1, 240),
+        secondsPerQuestion: clamp(+$("#perq").value, 0, 900),
+        passPercent: clamp(+$("#pass").value, 1, 100),
+        shuffleQuestions: $("#shuffle-q").checked,
+        shuffleAnswers: $("#shuffle-a").checked,
+        noBack: $("#no-back")?.checked || false
+      });
+      save();
+      return state.settings;
+    }
+    function startPractice(ids) {
+      const s = readRunSettings();
+      const bank = filteredBank();
+      const base = ids?.length ? bank.filter(q => ids.includes(q.id)) : bank;
+      state.practice = { mode:"practice", questions: prepare(base, s).slice(0, ids?.length || s.count), index:0, answers:{}, timeById:{}, started: Date.now(), questionStarted: Date.now(), feedback:null };
+      showPractice();
+    }
+    function showPractice() {
+      const p = state.practice, item = p.questions[p.index];
+      if (!item) return finishPractice();
+      $("#run").innerHTML = questionHtml(item, p.index, p.questions.length, false) + noteHtml(item) + `<div class="button-row section"><button class="button" onclick="submitPractice()">Auswerten</button><button class="button secondary" onclick="markUncertain('${item.id}')">Unsicher markieren</button>${p.feedback ? `<button class="button next" onclick="nextPractice()">Weiter</button>` : ""}</div>${p.feedback || ""}`;
+      restoreChecks(p.answers[item.id] || []);
+    }
+    function submitPractice() {
+      const p = state.practice, item = p.questions[p.index], chosen = selected();
+      p.answers[item.id] = chosen;
+      p.timeById[item.id] = (p.timeById[item.id] || 0) + Math.round((Date.now() - p.questionStarted) / 1000);
+      const r = evaluate(item, chosen);
+      if (!r.correct && !state.repeatIds.includes(item.id)) state.repeatIds.push(item.id);
+      p.feedback = feedbackHtml(item, r);
+      save();
+      showPractice();
+    }
+    function nextPractice() { state.practice.feedback = null; state.practice.index++; state.practice.questionStarted = Date.now(); showPractice(); }
+    function finishPractice() {
+      const p = state.practice;
+      const details = p.questions.map(item => ({ questionId:item.id, chosen:p.answers[item.id] || [], correct:evaluate(item, p.answers[item.id] || []).correct, responseTimeSeconds:p.timeById[item.id] || 0, uncertain:state.uncertainIds.includes(item.id) }));
+      const correct = details.filter(d=>d.correct).length;
+      state.history.push({ id: crypto.randomUUID(), mode:"practice", date:new Date().toISOString(), total:p.questions.length, correct, percent:Math.round(correct/p.questions.length*100), durationSeconds: Math.round((Date.now()-p.started)/1000), details });
+      save();
+      $("#run").innerHTML = `<div class="card pad"><h2>Übungsrunde abgeschlossen</h2><p>${correct} von ${p.questions.length} Fragen korrekt (${Math.round(correct/p.questions.length*100)}%).</p><button class="button" onclick="render('practice')">Neue Runde</button></div>`;
+    }
+    function startExam() {
+      const s = readRunSettings();
+      const duration = s.secondsPerQuestion ? s.secondsPerQuestion * s.count : s.examMinutes * 60;
+      state.exam = { mode:"exam", questions: prepare(filteredBank(), s).slice(0, s.count), index:0, answers:{}, timeById:{}, started:Date.now(), questionStarted:Date.now(), duration, passPercent:s.passPercent, noBack:s.noBack };
+      tickExam();
+      state.timer = setInterval(tickExam, 500);
+      showExam();
+    }
+    function tickExam() {
+      if (!state.exam) return;
+      const left = Math.max(0, state.exam.duration - Math.floor((Date.now() - state.exam.started) / 1000));
+      const el = $("#time-left");
+      if (el) el.textContent = fmt(left);
+      if (left <= 0) finishExam(true);
+    }
+    function showExam() {
+      const e = state.exam, item = e.questions[e.index];
+      $("#run").innerHTML = `<div class="card pad"><div class="button-row" style="justify-content:space-between"><span class="timer">Restzeit: <span id="time-left">${fmt(e.duration)}</span></span><button class="button danger" onclick="finishExam(false)">Prüfung abgeben</button></div></div>` + questionHtml(item, e.index, e.questions.length, false) + `<div class="button-row section">${e.noBack ? "" : `<button class="button secondary" onclick="prevExam()">Zurück</button>`}<button class="button" onclick="nextExam()">Speichern & weiter</button></div>`;
+      restoreChecks(e.answers[item.id] || []);
+      tickExam();
+    }
+    function prevExam(){ storeExamAnswer(); state.exam.index = Math.max(0, state.exam.index - 1); state.exam.questionStarted = Date.now(); showExam(); }
+    function nextExam(){ storeExamAnswer(); state.exam.index = Math.min(state.exam.questions.length - 1, state.exam.index + 1); state.exam.questionStarted = Date.now(); showExam(); }
+    function storeExamAnswer(){ const item = state.exam.questions[state.exam.index]; state.exam.answers[item.id] = selected(); state.exam.timeById[item.id] = (state.exam.timeById[item.id] || 0) + Math.round((Date.now() - state.exam.questionStarted) / 1000); }
+    function finishExam(auto) {
+      if (!state.exam) return;
+      clearInterval(state.timer);
+      storeExamAnswer();
+      const e = state.exam;
+      const durationSeconds = Math.min(e.duration, Math.round((Date.now() - e.started) / 1000));
+      const details = e.questions.map(item => ({ questionId:item.id, chosen:e.answers[item.id] || [], correct:evaluate(item, e.answers[item.id] || []).correct, responseTimeSeconds:e.timeById[item.id] || 0, uncertain:state.uncertainIds.includes(item.id) }));
+      details.filter(d => !d.correct).forEach(d => { if (!state.repeatIds.includes(d.questionId)) state.repeatIds.push(d.questionId); });
+      const correct = details.filter(d=>d.correct).length;
+      const percent = Math.round(correct / e.questions.length * 100);
+      const result = { id: crypto.randomUUID(), mode:"exam", auto, date:new Date().toISOString(), total:e.questions.length, correct, percent, passPercent:e.passPercent, passed:percent >= e.passPercent, durationSeconds, details };
+      state.history.push(result);
+      state.exam = null;
+      save();
+      $("#run").innerHTML = examResult(result);
+    }
+    function questionHtml(item, index, total, reveal) {
+      return `<article class="card pad question-card"><div class="question-meta"><span class="pill">Frage ${index+1} von ${total}</span><span class="pill">Mehrfachauswahl möglich</span><span class="pill">${item.topic}</span></div><h2>${escapeHtml(item.question)}</h2><div class="answer-grid">${item.options.map(o => `<label class="option ${reveal && o.correct ? "correct" : ""}"><input name="answer" type="checkbox" value="${o.id}"><span><strong>${o.id})</strong> ${escapeHtml(o.text)}</span></label>`).join("")}</div></article>`;
+    }
+    function feedbackHtml(item, r) {
+      return `<div class="feedback ${r.correct ? "" : "error"}"><h3>${r.correct ? "Richtig" : "Falsch"}</h3><p><strong>Korrekt:</strong> ${correctIds(item).join(", ")} · <strong>Deine Antwort:</strong> ${r.chosen.length ? r.chosen.join(", ") : "keine"}</p><div class="answer-grid">${item.options.map(o => `<div class="option ${o.correct ? "correct" : (r.chosen.includes(o.id) ? "wrong" : "")}"><span><strong>${o.id})</strong> ${escapeHtml(o.text)}${o.correct ? " · korrekt" : ""}</span></div>`).join("")}</div><p>${escapeHtml(item.explanation)}</p></div>`;
+    }
+    function examResult(result) {
+      const wrongIds = result.details.filter(d => !d.correct).map(d => d.questionId);
+      return `<div class="card pad"><h2>${result.passed ? "Bestanden" : "Nicht bestanden"}</h2><p><strong>${result.percent}%</strong> · ${result.correct} von ${result.total} richtig · Bestehensgrenze ${result.passPercent}% · Zeitverbrauch ${fmt(result.durationSeconds)}${result.auto ? " · automatisch abgegeben" : ""}</p><div class="button-row"><button class="button" onclick='startReview(${JSON.stringify(wrongIds)})'>Review falscher Fragen</button><button class="button secondary" onclick="startRepeat()">Fehler wiederholen</button><button class="button secondary" onclick='exportReport(${JSON.stringify(result.id)})'>Bericht exportieren</button><button class="button secondary" onclick="render('exam')">Neue Prüfung</button></div></div><section class="list section">${result.details.map(d => detailHtml(d)).join("")}</section>`;
+    }
+    function detailHtml(d) {
+      const item = allQuestions().find(q => q.id === d.questionId), c = item ? correctIds(item) : [], chosen = d.chosen || [];
+      if (!item) return `<div class="list-item"><span class="pill bad">Frage nicht mehr vorhanden</span></div>`;
+      return `<div class="list-item"><div class="button-row" style="justify-content:space-between"><strong>Frage ${item.number}: ${escapeHtml(item.question)}</strong><span class="pill ${d.correct ? "good" : "bad"}">${d.correct ? "richtig" : "falsch"}</span></div><p><strong>Gewählt:</strong> ${chosen.length ? chosen.join(", ") : "keine"} · <strong>Korrekt:</strong> ${c.join(", ")} · <strong>Zeit:</strong> ${fmt(d.responseTimeSeconds || 0)}${d.uncertain ? " · unsicher" : ""}</p><p class="muted">${escapeHtml(item.explanation)}</p></div>`;
+    }
+    function questions() {
+      app.innerHTML = `<section class="card pad"><h2>Fragenbank</h2><p class="muted">Enthält die 114 überarbeiteten Fragen aus Überarbeitete Quizfragen.docx plus optional eigene lokale Fragen. Alte data-Inhalte und KI-Beauftragten-Fragen sind nicht enthalten. Die richtigen Antworten werden hier zur Kontrolle angezeigt.</p><input id="search" placeholder="Fragen oder Themen suchen"></section>
+      <section class="card pad section"><h2>Fragenqualität</h2><div id="quality-report" class="list section">${qualityReport()}</div></section>
+      <section class="grid cols-2 section">
+        <div class="card pad">
+          <h2>Frage manuell hinzufügen</h2>
+          <div class="grid section">
+            <label>Frage<input id="manual-question" placeholder="Fragetext"></label>
+            <label>Thema<input id="manual-topic" placeholder="z. B. IAM"></label>
+            <label>Erklärung<input id="manual-explanation" placeholder="Kurze Begründung"></label>
+            <label>Antwort A<input id="manual-a"></label>
+            <label>Antwort B<input id="manual-b"></label>
+            <label>Antwort C<input id="manual-c"></label>
+            <label>Antwort D<input id="manual-d"></label>
+            <label>Korrekte Antworten<input id="manual-correct" placeholder="z. B. B oder A,C,D"></label>
+            <button class="button" id="add-manual">Frage speichern</button>
+          </div>
+        </div>
+        <div class="card pad">
+          <h2>Fragen per Datei importieren</h2>
+          <p class="muted">Unterstützt JSON, TXT, MD, MD5 und einfache textbasierte PDF-Dateien. Pro Frage sind genau 4 Antwortmöglichkeiten erforderlich; 1 bis 3 davon müssen korrekt sein. Scans ohne eingebetteten Text können lokal nicht gelesen werden.</p>
+          <input id="file-import" type="file" accept=".json,.txt,.md,.md5,.md.5,.pdf,application/json,text/plain,text/markdown,application/pdf">
+          <div class="feedback section">
+            <strong>Textformat</strong>
+            <p>Eine Frage pro Block: <code>Frage:</code>, danach <code>A)</code> bis <code>D)</code>, <code>Korrekt:</code> und optional <code>Erklärung:</code>.</p>
+          </div>
+          <div id="import-result" class="section muted"></div>
+        </div>
+      </section>
+      <section id="qlist" class="list section"></section>`;
+      $("#search").addEventListener("input", renderQuestions);
+      $("#add-manual").addEventListener("click", addManualQuestion);
+      $("#file-import").addEventListener("change", importFile);
+      renderQuestions();
+    }
+    function renderQuestions() {
+      const term = ($("#search")?.value || "").toLowerCase();
+      const rows = allQuestions().filter(q => (q.question + q.topic).toLowerCase().includes(term));
+      $("#qlist").innerHTML = rows.map(item => `<div class="list-item"><div class="question-meta"><span class="pill">Frage ${item.number}</span><span class="pill">${item.topic}</span><span class="pill">Mehrfachauswahl möglich</span>${state.disabledIds.includes(item.id) ? `<span class="pill bad">deaktiviert</span>` : ""}${item.custom ? `<span class="pill warn">eigene Frage</span>` : `<span class="pill">Original</span>`}</div><h3>${escapeHtml(item.question)}</h3><div class="answer-grid">${item.options.map(o => `<div class="option ${o.correct ? "correct" : ""}"><span><strong>${o.id})</strong> ${escapeHtml(o.text)}${o.correct ? " · korrekt" : ""}</span></div>`).join("")}</div><p class="muted">Die richtigen Antworten sind in der Fragenbank markiert. In Übung und Prüfung bleibt die Bewertung exakt: alle richtigen und keine falschen Antworten.</p><div class="button-row"><button class="button ghost" onclick="toggleDisabled('${item.id}')">${state.disabledIds.includes(item.id) ? "Aktivieren" : "Deaktivieren"}</button>${item.custom ? `<button class="button ghost" onclick="deleteCustomQuestion('${item.id}')">Eigene Frage löschen</button>` : ""}</div></div>`).join("");
+    }
+    function qualityReport() {
+      const seen = new Map(), notes = [];
+      allQuestions().forEach(q => {
+        const key = q.question.toLowerCase().replace(/\s+/g, " ").trim();
+        if (seen.has(key)) notes.push(`Mögliches Duplikat: Frage ${seen.get(key)} und Frage ${q.number}`);
+        seen.set(key, q.number);
+        if (q.question.length > 360) notes.push(`Sehr langer Fragetext: Frage ${q.number}`);
+        if (q.options.some(o => o.text.length < 4)) notes.push(`Sehr kurze Antwortoption: Frage ${q.number}`);
+        if (q.options.length !== 4) notes.push(`Nicht genau 4 Antwortoptionen: Frage ${q.number}`);
+        const correct = q.options.filter(o => o.correct).length;
+        if (correct < 1 || correct > 3) notes.push(`Ungewöhnliches Lösungsmuster: Frage ${q.number}`);
+      });
+      return notes.length ? notes.slice(0, 20).map(n => `<div class="list-item"><span class="pill warn">Hinweis</span> ${escapeHtml(n)}</div>`).join("") : `<div class="list-item"><span class="pill good">OK</span> Keine auffälligen Strukturprobleme gefunden.</div>`;
+    }
+    function analysis() {
+      const exams = state.history.filter(h=>h.mode==="exam");
+      app.innerHTML = `<section class="grid cols-3">${metric("Gespeicherte Ergebnisse", state.history.length, "lokal im Browser")}${metric("Bestanden", exams.filter(e=>e.passed).length, "Prüfungssimulationen")}${metric("Fehlerfragen", state.repeatIds.length, "für Wiederholung")}</section><section class="card pad section"><h2>Themenanalyse</h2><div class="list section">${weakTopics(true).map(w=>`<div class="list-item"><strong>${w.topic}</strong><p>${w.correct}/${w.total} richtig · ${w.rate}%</p><div class="bar"><span style="width:${w.rate}%"></span></div></div>`).join("") || `<p class="muted">Noch keine Ergebnisse.</p>`}</div></section><section class="card pad section"><h2>Verlauf</h2><div class="list">${state.history.slice().reverse().map(h=>`<div class="list-item"><strong>${h.mode === "exam" ? "Prüfung" : "Übung"} · ${new Date(h.date).toLocaleString("de-DE")}</strong><p>${h.percent}% · ${h.correct}/${h.total} richtig · ${fmt(h.durationSeconds)}</p></div>`).join("") || `<p class="muted">Noch keine Ergebnisse.</p>`}</div><div class="button-row section"><button class="button danger" onclick="resetStats()">Lernstand zurücksetzen</button></div></section>`;
+    }
+    function settings() {
+      app.innerHTML = `<section class="card pad"><h2>Einstellungen</h2>${settingsPanel("exam")}<div class="button-row section"><button class="button" onclick="saveSettingsOnly()">Speichern</button><button class="button secondary" onclick="exportData()">Ergebnisse exportieren</button></div></section><section class="card pad section"><h2>Importverlauf</h2><div class="list">${state.importReports.slice().reverse().map(r=>`<div class="list-item"><strong>${escapeHtml(r.file || "Import")}</strong><p>${new Date(r.date).toLocaleString("de-DE")} · ${r.accepted} übernommen · ${r.rejected} abgelehnt · ${r.total} erkannt</p></div>`).join("") || `<p class="muted">Noch keine Importe.</p>`}</div></section>`;
+    }
+    function saveSettingsOnly(){ readRunSettings(); render("dashboard"); }
+    function exportData(){
+      const blob = new Blob([JSON.stringify({ exportedAt:new Date().toISOString(), appVersion:APP_VERSION, questions:allQuestions(), history:state.history, repeatIds:state.repeatIds, uncertainIds:state.uncertainIds, disabledIds:state.disabledIds, notes:state.notes, importReports:state.importReports, settings:state.settings }, null, 2)], {type:"application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "tuev-it-sicherheit-lernstand.json"; a.click(); URL.revokeObjectURL(a.href);
+    }
+    function resetStats(){ if(confirm("Lernstand und Ergebnisse wirklich löschen?")){ state.history=[]; state.repeatIds=[]; save(); render("analysis"); } }
+    function startRepeat(){ const ids = prioritizedRepeatIds(); if(!ids.length){ alert("Aktuell gibt es keine Fehlerfragen zur Wiederholung."); return; } render("practice"); setTimeout(()=>startPractice(ids), 0); }
+    function startReview(ids){ if(!ids.length){ alert("Keine falschen Fragen in dieser Prüfung."); return; } render("practice"); setTimeout(()=>startPractice(ids), 0); }
+    function questionBank(){ return [...DEFAULT_QUESTIONS, ...state.customQuestions].filter(q => !state.disabledIds.includes(q.id)); }
+    function allQuestions(){ return [...DEFAULT_QUESTIONS, ...state.customQuestions]; }
+    function topics(){ return [...new Set(questionBank().map(q => q.topic))].sort((a,b)=>a.localeCompare(b, "de")); }
+    function filteredBank(){ const t = state.settings.topic || "Alle"; return t === "Alle" ? questionBank() : questionBank().filter(q => q.topic === t); }
+    function noteHtml(item){ return `<section class="card pad section"><label>Meine Notiz zu dieser Frage<textarea onchange="saveNote('${item.id}', this.value)" placeholder="Eigene Eselsbrücke, Unsicherheit oder Merksatz">${escapeHtml(state.notes[item.id] || "")}</textarea></label></section>`; }
+    function saveNote(id, value){ state.notes[id] = value; save(); }
+    function markUncertain(id){ if(!state.uncertainIds.includes(id)) state.uncertainIds.push(id); if(!state.repeatIds.includes(id)) state.repeatIds.push(id); save(); alert("Als unsicher markiert und zur Wiederholung vorgemerkt."); }
+    function toggleDisabled(id){ if(state.disabledIds.includes(id)) state.disabledIds = state.disabledIds.filter(x => x !== id); else state.disabledIds.push(id); save(); renderQuestions(); }
+    function prioritizedRepeatIds(){
+      const wrongCounts = new Map();
+      const slowIds = [];
+      state.history.flatMap(h => h.details || []).forEach(d => { if(!d.correct) wrongCounts.set(d.questionId, (wrongCounts.get(d.questionId) || 0) + 1); if ((d.responseTimeSeconds || 0) >= 90) slowIds.push(d.questionId); });
+      return [...new Set([...state.repeatIds, ...state.uncertainIds, ...slowIds])]
+        .filter(id => questionBank().some(q => q.id === id))
+        .sort((a,b) => (wrongCounts.get(b)||0) - (wrongCounts.get(a)||0) || (state.uncertainIds.includes(b) - state.uncertainIds.includes(a)));
+    }
+    function exportReport(id){
+      const result = state.history.find(h => h.id === id);
+      if(!result) return;
+      const rows = result.details.map(d => {
+        const q = allQuestions().find(item => item.id === d.questionId);
+        return `<tr><td>${q?.number || ""}</td><td>${escapeHtml(q?.topic || "")}</td><td>${d.correct ? "richtig" : "falsch"}</td><td>${escapeHtml((d.chosen || []).join(", ") || "keine")}</td><td>${escapeHtml(q ? correctIds(q).join(", ") : "")}</td><td>${fmt(d.responseTimeSeconds || 0)}</td></tr>`;
+      }).join("");
+      const html = `<!doctype html><html lang="de"><meta charset="utf-8"><title>Prüfungsbericht</title><body><h1>Prüfungsbericht IT-Security-Beauftragte:r</h1><p>${new Date(result.date).toLocaleString("de-DE")} · ${result.percent}% · ${result.passed ? "bestanden" : "nicht bestanden"} · ${fmt(result.durationSeconds)}</p><table border="1" cellspacing="0" cellpadding="6"><tr><th>Nr.</th><th>Thema</th><th>Status</th><th>Gewählt</th><th>Korrekt</th><th>Zeit</th></tr>${rows}</table></body></html>`;
+      const blob = new Blob([html], {type:"text/html"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `pruefungsbericht-${result.date.slice(0,10)}.html`; a.click(); URL.revokeObjectURL(a.href);
+    }
+    function handleKeys(event) {
+      if (["INPUT","TEXTAREA","SELECT"].includes(event.target.tagName)) return;
+      const key = event.key.toUpperCase();
+      if (["A","B","C","D"].includes(key)) {
+        const el = document.querySelector(`[name=answer][value="${key}"]`);
+        if (el) { el.checked = !el.checked; event.preventDefault(); }
+      }
+      if (event.key === "Enter") {
+        const next = document.querySelector(".button.next");
+        const answers = document.querySelector("[name=answer]");
+        if (next) next.click();
+        else if (answers && state.practice) submitPractice();
+      }
+    }
+    function addManualQuestion() {
+      const texts = ["a","b","c","d"].map(x => $(`#manual-${x}`).value.trim()).filter(Boolean);
+      const correct = $("#manual-correct").value.toUpperCase().split(/[\s,;]+/).filter(Boolean);
+      const item = normalizeQuestion({
+        question: $("#manual-question").value.trim(),
+        topic: $("#manual-topic").value.trim() || "Eigene Fragen",
+        explanation: $("#manual-explanation").value.trim() || "Eigene Frage ohne hinterlegte Erklärung.",
+        options: texts.map((text, i) => ({ id: String.fromCharCode(65 + i), text, correct: correct.includes(String.fromCharCode(65 + i)) }))
+      });
+      if (!item.valid) return alert(item.error);
+      state.customQuestions.push(item.question);
+      save();
+      ["question","topic","explanation","a","b","c","d","correct"].forEach(x => $(`#manual-${x}`).value = "");
+      renderQuestions();
+    }
+    async function importFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const lowerName = file.name.toLowerCase();
+      const ext = lowerName.endsWith(".md.5") ? "md5" : lowerName.split(".").pop();
+      const target = $("#import-result");
+      try {
+        let imported;
+        if (ext === "json") {
+          imported = parseJsonQuestions(await file.text());
+        } else if (ext === "pdf") {
+          imported = parseTextQuestions(extractPdfText(await file.arrayBuffer()));
+        } else if (["txt","md","md5"].includes(ext)) {
+          imported = parseTextQuestions(await file.text());
+        } else {
+          throw new Error("Dieses Format wird nicht unterstützt.");
+        }
+        if (!imported.length) throw new Error("Keine gültigen Fragen gefunden.");
+        const preview = state._lastImportReport || { accepted:imported.length, rejected:0, total:imported.length };
+        if (!confirm(`Importvorschau:\n${preview.total} Blöcke erkannt\n${preview.accepted} gültige Fragen\n${preview.rejected} abgelehnt\n\nImport jetzt übernehmen?`)) {
+          target.textContent = "Import abgebrochen.";
+          return;
+        }
+        state.customQuestions.push(...imported);
+        state.importReports.push({ date:new Date().toISOString(), file:file.name, ...(state._lastImportReport || { accepted:imported.length, rejected:0, total:imported.length }) });
+        state.importReports = state.importReports.slice(-10);
+        save();
+        const report = state._lastImportReport || { accepted: imported.length, rejected: 0, total: imported.length };
+        target.textContent = `${report.accepted} Frage(n) importiert, ${report.rejected} abgelehnt, ${report.total} erkannt.`;
+        renderQuestions();
+      } catch (error) {
+        target.textContent = `Import fehlgeschlagen: ${error.message}`;
+      } finally {
+        event.target.value = "";
+      }
+    }
+    function parseJsonQuestions(text) {
+      const raw = JSON.parse(text);
+      const list = Array.isArray(raw) ? raw : Array.isArray(raw.questions) ? raw.questions : [];
+      const mapped = list.map(normalizeQuestion);
+      state._lastImportReport = { total:list.length, accepted:mapped.filter(item => item.valid).length, rejected:mapped.filter(item => !item.valid).length };
+      return mapped.filter(item => item.valid).map(item => item.question);
+    }
+    function parseTextQuestions(text) {
+      const cleaned = text.replace(/\r/g, "").replace(/☐/g, "\n").replace(/([A-F]\))/g, "\n$1");
+      const blocks = cleaned.split(/\n\s*(?=(?:Frage|Question)\s*:|\d+[\.)]\s+)/i).map(x => x.trim()).filter(Boolean);
+      const parsed = [];
+      for (const block of blocks) {
+        const lines = block.split("\n").map(x => x.trim()).filter(Boolean);
+        const optionLines = lines.filter(line => /^[A-F][\).:-]\s+/i.test(line));
+        if (!optionLines.length) continue;
+        const firstOption = lines.findIndex(line => /^[A-F][\).:-]\s+/i.test(line));
+        const questionText = lines.slice(0, firstOption).join(" ").replace(/^(Frage|Question)\s*:\s*/i, "").replace(/^\d+[\.)]\s*/, "").trim();
+        const correctLine = lines.find(line => /^(Korrekt|Richtig|Correct|Antwort)\s*:/i.test(line)) || "";
+        const explanationLine = lines.find(line => /^(Erklärung|Begründung|Explanation)\s*:/i.test(line)) || "";
+        const correct = (correctLine.match(/[A-F]/gi) || []).map(x => x.toUpperCase());
+        const options = optionLines.map(line => {
+          const id = line[0].toUpperCase();
+          const marked = /^[A-F][\).:-]\s*(\*|\[x\]|x\s)/i.test(line);
+          return { id, text: line.replace(/^[A-F][\).:-]\s*(\*|\[x\]|x\s)?/i, "").trim(), correct: correct.includes(id) || marked };
+        });
+        const item = normalizeQuestion({ question: questionText, topic: "Import", explanation: explanationLine.replace(/^[^:]+:\s*/, "") || "Importierte Frage ohne hinterlegte Erklärung.", options });
+        if (item.valid) parsed.push(item.question);
+      }
+      state._lastImportReport = { total:blocks.length, accepted:parsed.length, rejected:Math.max(0, blocks.length - parsed.length) };
+      return parsed;
+    }
+    function extractPdfText(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      const chunks = [];
+      binary.replace(/\(([^()]*)\)\s*Tj/g, (_, t) => chunks.push(t));
+      binary.replace(/\[((?:.|\n)*?)\]\s*TJ/g, (_, group) => group.replace(/\(([^()]*)\)/g, (__, t) => chunks.push(t)));
+      const text = chunks.join("\n").replace(/\\([()\\])/g, "$1").replace(/\\n/g, "\n");
+      if (!text.trim()) throw new Error("Aus dieser PDF konnte lokal kein Text extrahiert werden. Bitte als TXT, MD oder JSON exportieren.");
+      return text;
+    }
+    function normalizeQuestion(raw) {
+      const question = String(raw.question || raw.frage || "").trim();
+      const sourceOptions = raw.options || raw.antworten || [];
+      const options = sourceOptions.map((o, i) => ({
+        id: (o.id || String.fromCharCode(65 + i)).toUpperCase(),
+        text: String(o.text || o.answer || o.antwort || "").trim(),
+        correct: Boolean(o.correct ?? o.richtig)
+      })).filter(o => o.text);
+      const correctCount = options.filter(o => o.correct).length;
+      if (!question) return { valid:false, error:"Bitte einen Fragetext angeben." };
+      if (options.length !== 4) return { valid:false, error:"Eine Frage braucht genau 4 Antwortmöglichkeiten." };
+      if (correctCount < 1) return { valid:false, error:"Mindestens eine Antwort muss korrekt sein." };
+      if (correctCount > 3) return { valid:false, error:"Maximal 3 Antworten dürfen korrekt sein." };
+      const number = DEFAULT_QUESTIONS.length + state.customQuestions.length + 1;
+      return { valid:true, question: { id:`custom-${Date.now()}-${Math.random().toString(16).slice(2)}`, number, custom:true, question, topic: String(raw.topic || raw.thema || "Eigene Fragen").trim(), explanation: String(raw.explanation || raw.erklärung || raw.begruendung || "Eigene Frage ohne hinterlegte Erklärung.").trim(), type: "choice", options } };
+    }
+    function deleteCustomQuestion(id) {
+      if (!confirm("Eigene Frage wirklich löschen?")) return;
+      state.customQuestions = state.customQuestions.filter(q => q.id !== id);
+      state.repeatIds = state.repeatIds.filter(qid => qid !== id);
+      save();
+      renderQuestions();
+    }
+    function prepare(items, s) {
+      const qs = s.shuffleQuestions ? shuffle(items) : [...items];
+      return qs.map(item => ({...item, options: s.shuffleAnswers ? shuffle(item.options) : [...item.options]}));
+    }
+    function selected(){ return [...document.querySelectorAll("[name=answer]:checked")].map(i=>i.value).sort(); }
+    function restoreChecks(ids){ ids.forEach(id => { const el = document.querySelector(`[name=answer][value="${id}"]`); if(el) el.checked = true; }); }
+    function evaluate(item, chosen) { const a = correctIds(item).sort(); const b = [...chosen].sort(); return { correct: a.length === b.length && a.every((v,i)=>v===b[i]), chosen:b }; }
+    function correctIds(item){ return item.options.filter(o=>o.correct).map(o=>o.id).sort(); }
+    function weakTopics(all=false) {
+      const map = new Map();
+      state.history.flatMap(h=>h.details).forEach(d => { const q = allQuestions().find(x=>x.id===d.questionId); if(!q) return; const m = map.get(q.topic) || {topic:q.topic,total:0,correct:0}; m.total++; if(d.correct)m.correct++; map.set(q.topic,m); });
+      return [...map.values()].map(x=>({...x, rate: x.total ? Math.round(x.correct/x.total*100) : 0})).filter(x=>all || x.rate < 80).sort((a,b)=>a.rate-b.rate || b.total-a.total);
+    }
+    function weekGoals() {
+      const stats = weakTopics(true);
+      return topics().filter(t => /Kurswoche|Ergänzungsfragen/.test(t)).map(t => {
+        const total = questionBank().filter(q => q.topic === t).length;
+        const s = stats.find(x => x.topic === t) || {total:0, rate:0};
+        return `<div class="list-item"><strong>${escapeHtml(t)}</strong><p>${s.total}/${total} bearbeitet · ${s.rate}% richtig</p><div class="bar"><span style="width:${total ? Math.min(100, Math.round(s.total / total * 100)) : 0}%"></span></div></div>`;
+      }).join("");
+    }
+    function metric(label, value, sub){ return `<div class="card pad metric"><span class="muted">${label}</span><strong>${value}</strong><span class="muted">${sub}</span></div>`; }
+    function resultMini(r){ return `<p><strong>${r.percent}%</strong> · ${r.passed ? "bestanden" : "nicht bestanden"}</p><p class="muted">${r.correct}/${r.total} richtig, ${fmt(r.durationSeconds)} Zeitverbrauch</p>`; }
+    function fmt(seconds){ seconds = Math.max(0, seconds || 0); const m = Math.floor(seconds/60), s = seconds%60; return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+    function shuffle(arr){ return [...arr].map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+    function clamp(n,min,max){ return Math.max(min, Math.min(max, Number.isFinite(n) ? n : min)); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch])); }
+  </script>
+</body>
+</html>
